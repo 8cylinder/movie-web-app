@@ -1,0 +1,289 @@
+#!/usr/bin/env bash
+
+quiet=$2;
+
+build_execute_dir=~/projects/movie_stalker/
+
+log_dir=$build_execute_dir/app/
+build_tools_dir=$log_dir/tools/
+config_file=$log_dir/config.ini
+output_file=$log_dir/build.log
+distroot=$build_execute_dir/dist/site
+
+for f in $build_execute_dir $log_dir $build_tools_dir \
+         $config_file $output_file $distroot; do
+    if [ ! -e $f ]; then
+        echo "$f does not exist"
+        exit
+    fi
+done
+
+cd $build_execute_dir
+source $build_tools_dir/color_and_error.bash
+
+deps="java gjslint fixjsstyle html-builder read-data"  # <-- not used
+COMPILER=~/bin-apps/closure-compiler/compiler.jar
+if [ ! -e "$(which java)" ]; then
+    error 'Java must be installed to run the closure compiler'
+fi
+if [ ! -e "$COMPILER" ]; then
+    echo 'Download from: http://closure-compiler.googlecode.com/files/compiler-latest.zip'
+    error "$COMPILER does not exist"
+fi
+
+COMPILE_VENDOR='false'
+if [ "$2" == 'compile_vendor' ]; then
+	COMPILE_VENDOR='true'
+fi
+
+title(){
+    if [ "$quiet" == 'quiet' ]; then return; fi
+    echo ''
+    colorize "$1" $ulon$blueb
+}
+ok(){
+    if [ "$quiet" == 'quiet' ]; then return; fi
+    colorize "[ok]" $greenf nonl
+    echo " $*"
+}
+err(){
+    if [ "$quiet" == 'quiet' ]; then
+        echo "[$1] $2"
+    else
+        colorize "[$1]" $redf$boldon nonl
+        echo " $2"
+    fi
+    exit
+}
+get-files(){
+    ini_files=$($build_tools_dir/read-data $config_file $1)
+    for f in $ini_files; do
+        if [ ! -e $f ]; then
+            echo "$f Does not exist."
+            exit 1
+        fi
+    done
+
+    echo $ini_files
+}
+
+# remove old output files
+rm $log_dir/*output 2>/dev/null
+
+
+js_assets=$(get-files js) || error $js_assets
+
+# ----------------------------------------------------
+dolint(){
+    if [ "$quiet" == 'quiet' ]; then return; fi
+
+	title 'Lint js_assets:'
+
+	for f in $js_assets; do
+		# if gjslint --strict $f 2>&1 | tee --append $output_file; then
+		if gjslint --strict $f; then
+			ok $f
+		else
+			echo ''
+			while true; do
+				read -p "Lint error: Try to fix errors?  <y> to fix: " yn
+				case $yn in
+					[Yy]* )
+						fixjsstyle --strict $f;
+						break
+						;;
+					* )
+						exit
+						;;
+				esac
+			done
+			exit
+		fi
+	done
+}
+
+
+# ----------------------------------------------------
+# rebuild app dir structure
+
+rebuild_dir(){
+	rm -rf dist/*
+	mkdir $distroot $distroot/js $distroot/css $distroot/images
+}
+
+
+# ----------------------------------------------------
+compile_app(){
+	title 'Compile app js:'
+
+	js="$distroot/js"
+    pretty=''
+    if [ "$1" = 'pretty' ]; then
+        pretty='--formatting PRETTY_PRINT'
+    fi
+
+    #fastcompile='--compilation_level ADVANCED_OPTIMIZATIONS'
+    #if [ "$1" = 'fastcompile' ]; then
+    #    fastcompile=''
+    #fi
+
+	js_name='main.js'
+	js_temp='main-UNCOMPILED.js'
+	cat $js_assets > $js/$js_temp
+
+    if [ "$1" = 'fast' ]; then
+        mv $js/$js_temp $js/$js_name
+        ok "FAST COMPILE - $js/$js_name"
+        return
+    fi
+
+        # --formatting PRETTY_PRINT \
+	if java -jar $COMPILER \
+            --compilation_level ADVANCED_OPTIMIZATIONS \
+            $pretty \
+            --js $js/$js_temp \
+            --create_source_map $js/$js_name.sourcemap \
+            --js_output_file $js/$jsn_name \
+        1>$output_file 2>$output_file; then
+
+		rm $js/$js_temp
+		# write the source map string to the compiled js
+		(echo; echo "//@ sourceMappingURL=$js_name.sourcemap") >> $js/$js_name
+
+		ok "$js/main.js"
+	else
+		err 'compile error' " $js/$js_temp"
+	fi
+}
+
+
+# ----------------------------------------------------
+# compile or copy vendor libs
+
+compile-copy_vendor(){
+	vend_temp=vendor-UNCOMPILED.js
+	vend_js=vendor.js
+	vendor_libs=$(get-files vendor) || error $vendor_libs
+	if [ $COMPILE_VENDOR = 'true' ]; then
+		title 'Compile vendor js:'
+		cat $vendor_libs > $js/$vend_temp
+            #--formatting PRETTY_PRINT \
+		if java -jar $COMPILER \
+                --compilation_level SIMPLE_OPTIMIZATIONS \
+			    --js $js/$vend_temp \
+                --js_output_file $js/vend.js \
+            1>$output_file 2>$output_file; then
+
+			rm $js/$vend_temp
+			ok " $js/vend_js"
+		else
+			err 'compile error' " $js/$vend_temp"
+		fi
+	else
+		title 'Copy vendor js:'
+		if cp $vendor_libs $js; then
+			for f in $vendor_libs; do
+				ok "$(basename $f)";
+			done
+		else
+			err 'copy vendor js failed'
+		fi
+	fi
+}
+
+
+# ----------------------------------------------------
+copy_css(){
+    title 'Copy CSS:'
+    css_assets=$(get-files css) || error $css_assets
+    if cp $css_assets "$distroot/css"; then
+        ok $css_assets
+    else
+        err $css_assets
+    fi
+}
+
+
+# ----------------------------------------------------
+build_html(){
+	title 'Build html:'
+
+    destdir=$distroot
+    parent_template='./app/html/html_templates/frame.html'
+    html_assets=$(get-files html) || error $html_assets
+
+    for f in $html_assets; do
+        if $build_tools_dir/html-builder $f $parent_template $destdir \
+            >$output_file; then
+            ok $f
+        else
+            more build.log
+            err 'compile error' $f
+            exit
+        fi
+    done
+}
+
+
+# ----------------------------------------------------
+tidy_html(){
+	title 'Tidy html:'
+
+    tidy -indent -modify -asxhtml \
+        -wrap 80 -file $output_file $destdir/*html;
+
+    if [ $? == 0 ]; then
+        ok 'tidy: $destdir'
+    elif [ $? == 1 ]; then
+        warn=$(colorize "[some warnings]" $yellowf)
+        ok "$warn tidy: $destdir/*html"
+    elif [ $? == 2 ]; then
+        err 'tidy error' " $destdir/*html"
+    fi
+}
+
+showtree(){
+    if [ "$quiet" == 'quiet' ]; then return; fi
+    echo
+	tree -h --dirsfirst $distroot
+}
+
+case $1 in
+	dev)
+		dolint
+		rebuild_dir
+		compile_app 'pretty'
+		compile-copy_vendor
+        copy_css
+		build_html
+		tidy_html
+
+		showtree
+		;;
+	prod)
+        # compile js handlebar templates
+        # set debug flag with @define
+		;;
+	compile_vendor)
+		;;
+	clean)
+        # delete sqlite db?
+		;;
+	lint)
+		dolint
+		;;
+    fast)
+		build_html
+        copy_css
+        compile_app 'fast'
+        compile-copy_vendor
+
+        showtree
+        ;;
+	*)
+        if [ "$1" ]; then
+		    echo "Unknown command: $1"
+        fi
+        echo "Usage: $(basename $0) [dev|prod|fast|compile_vendor|clean|lint]"
+
+esac
