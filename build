@@ -72,6 +72,7 @@ rm $log_dir/*output 2>/dev/null
 
 
 js_assets=$(get-files js) || error $js_assets
+vendor_libs=$(get-files vendor_js) || error $vendor_libs
 
 # ----------------------------------------------------
 dolint(){
@@ -79,27 +80,32 @@ dolint(){
 
 	title 'Lint js_assets:'
 
-	for f in $js_assets; do
-		# if gjslint --strict $f 2>&1 | tee --append $output_file; then
-		if gjslint --strict $f; then
-			ok $f
-		else
-			echo ''
-			while true; do
-				read -p "Lint error: Try to fix errors?  <y> to fix: " yn
-				case $yn in
-					[Yy]* )
-						fixjsstyle --strict $f;
-						break
-						;;
-					* )
-						exit
-						;;
-				esac
-			done
-			exit
-		fi
-	done
+    for f in $js_assets; do
+        out=$(fixjsstyle --strict $f);
+        ok "$f  $out";
+    done
+
+	#for f in $js_assets; do
+	#    # if gjslint --strict $f 2>&1 | tee --append $output_file; then
+	#    if gjslint --strict $f; then
+	#    	ok $f
+	#    else
+	#    	echo ''
+	#    	while true; do
+	#    		read -p "Lint error: Try to fix errors?  <y> to fix: " yn
+	#    		case $yn in
+	#    			[Yy]* )
+	#    				fixjsstyle --strict $f;
+	#    				break
+	#    				;;
+	#    			* )
+	#    				exit
+	#    				;;
+	#    		esac
+	#    	done
+	#    	exit
+	#    fi
+	#done
 }
 
 
@@ -108,7 +114,8 @@ dolint(){
 
 rebuild_dir(){
 	rm -rf dist/*
-	mkdir $distroot $distroot/js $distroot/css $distroot/images
+	mkdir $distroot $distroot/js $distroot/css \
+        $distroot/images $distroot/css/images
 }
 
 
@@ -117,9 +124,9 @@ compile_app(){
 	title 'Compile app js:'
 
 	js="$distroot/js"
-    pretty=''
+    format='--formatting PRINT_INPUT_DELIMITER'
     if [ "$1" = 'pretty' ]; then
-        pretty='--formatting PRETTY_PRINT'
+        format='--formatting PRINT_INPUT_DELIMITER --formatting PRETTY_PRINT'
     fi
 
     #fastcompile='--compilation_level ADVANCED_OPTIMIZATIONS'
@@ -128,31 +135,46 @@ compile_app(){
     #fi
 
 	js_name='main.js'
-	js_temp='main-UNCOMPILED.js'
-	cat $js_assets > $js/$js_temp
 
-    if [ "$1" = 'fast' ]; then
-        mv $js/$js_temp $js/$js_name
+    if [ "$1" == 'fast' ]; then
+        cat $js_assets > $js/$js_name
         ok "FAST COMPILE - $js/$js_name"
-        return
+        exit
     fi
 
-        # --formatting PRETTY_PRINT \
+    # build [--js FILE ...etc.] list:
+    for f in $js_assets; do
+        source_list="$source_list --js $f"
+    done
+
+    # externs extractor: http://www.dotnetwise.com/Code/Externs/index.html
+    # prebuilt externs: http://code.google.com/p/closure-compiler/wiki/ExternsForCommonLibraries
+    vendor_externs=$(get-files vendor_externs) || error $vendor_externs
+    for f in $vendor_externs; do
+        externs="$externs --externs $f"
+    done
+
 	if java -jar $COMPILER \
             --compilation_level ADVANCED_OPTIMIZATIONS \
-            $pretty \
-            --js $js/$js_temp \
+            $format \
+            $source_list \
             --create_source_map $js/$js_name.sourcemap \
-            --js_output_file $js/$jsn_name \
-        1>$output_file 2>$output_file; then
+            $externs \
+            --js_output_file $js/$js_name \
+            > $output_file 2>&1
+            # 1>$output_file 2>$output_file;
+    then
+        if $(grep WARNING $output_file); then
+            err $(cat $output_file)
+        fi
 
-		rm $js/$js_temp
 		# write the source map string to the compiled js
 		(echo; echo "//@ sourceMappingURL=$js_name.sourcemap") >> $js/$js_name
 
 		ok "$js/main.js"
 	else
-		err 'compile error' " $js/$js_temp"
+        err $(cat $output_file)
+		err 'compile error' " $js/$js_name"
 	fi
 }
 
@@ -163,7 +185,7 @@ compile_app(){
 compile-copy_vendor(){
 	vend_temp=vendor-UNCOMPILED.js
 	vend_js=vendor.js
-	vendor_libs=$(get-files vendor) || error $vendor_libs
+	# vendor_libs=$(get-files vendor_js) || error $vendor_libs
 	if [ $COMPILE_VENDOR = 'true' ]; then
 		title 'Compile vendor js:'
 		cat $vendor_libs > $js/$vend_temp
@@ -201,6 +223,13 @@ copy_css(){
     else
         err $css_assets
     fi
+
+    vendor_images=$(get-files vendor_images) || error $vendor_images
+    if cp $vendor_images "$distroot/css/images"; then
+        ok $vendor_images
+    else
+        err $vendor_images
+    fi
 }
 
 
@@ -230,7 +259,7 @@ tidy_html(){
 	title 'Tidy html:'
 
     tidy -indent -modify -asxhtml \
-        -wrap 80 -file $output_file $destdir/*html;
+        -wrap 100 -file $output_file $destdir/*html;
 
     if [ $? == 0 ]; then
         ok 'tidy: $destdir'
