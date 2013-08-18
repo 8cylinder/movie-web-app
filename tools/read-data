@@ -22,7 +22,7 @@ def main(inifile, section, variable_name):
     # config parse returns the wrong error if
     # the file does not exist, so cause an error
     # by trying to read a nonexistent file first.
-   open (inifile)
+    open (inifile)
 
     cf = ConfigParser.ConfigParser()
     cf.read(inifile)
