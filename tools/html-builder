@@ -4,13 +4,17 @@
 HTML Builder
 
 Usage:
-  html-builder <filename> <parent> <destination>
+  html-builder <filename> <destination> [variables]
 
-All arguments are required.
+filename and destination are required.
+
+variables is an optional json formated string that contains
+replacement values for placeholder strings in the html file.  The
+placeholder looks like this: %placeholder%
 
 filename:     Source filename
-parent:       Parent template to combine with filename
 destination:  Destination for compiled html
+variables:    JSON formated string
 
 '''
 
