@@ -26,6 +26,7 @@ def main(args):
     filename = args['<filename>']
     parent = args['<parent>']
     destination = args['<destination>']
+    substitute = args['variables']
 
     try:
         content = open(filename).read()
@@ -34,12 +35,15 @@ def main(args):
         mtitle = re.search('<template-title>(.*)</template-title>', content)
         title = mtitle.groups()[0]
         title_tag = mtitle.group()
-        # print 'title:', title, title_tag
 
         mfilename = re.search('<template-filename>(.*)</template-filename>', content)
         filename = mfilename.groups()[0]
         filename_tag = mfilename.group()
-        # print 'filename:', filename, filename_tag
+
+        reparent = re.search('<template-parent>(.*)</template-parent>', content)
+        parent = reparent.groups()[0]
+        parent = parent.replace(substitute['%template_root%'], template_root)
+        parent_tag = reparent.group()
 
         # now erase info tags
         content = content.replace(filename_tag, '')
