@@ -2,23 +2,46 @@
 
 quiet=$2;
 
-build_execute_dir=%src_root%
+build_dir=$(dirname $0)
+cd $build_dir
 
-log_dir=$build_execute_dir/app/
-build_tools_dir=$log_dir/tools/
-config_file=$log_dir/config.ini
-output_file=$log_dir/build.log
-distroot=$build_execute_dir/dist/site
+build_tools_dir=tools
+if [ ! -e $build_tools ]; then
+    echo "$build_tools does not exist"
+    exit
+fi
+config_file=config.ini
+if [ ! -e $config_file ]; then
+    echo "$config_file does not exist"
+    exit
+fi
+distroot=$($build_tools_dir/read-data $config_file files dist)
+if [ ! -e $distroot ]; then
+    echo "$distroot does not exist"
+    exit
+fi
+output_file=build.log
 
-for f in $build_execute_dir $log_dir $build_tools_dir \
-         $config_file $output_file $distroot; do
-    if [ ! -e $f ]; then
-        echo "$f does not exist"
-        exit
-    fi
-done
 
-cd $build_execute_dir
+#exit
+#
+#build_execute_dir=%src_root%
+#
+#log_dir=$build_execute_dir/app/
+#build_tools_dir=$log_dir/tools/
+#config_file=$log_dir/config.ini
+#output_file=$log_dir/build.log
+#distroot=$build_execute_dir/dist/site
+#
+#for f in $build_execute_dir $log_dir $build_tools_dir \
+#         $config_file $output_file $distroot; do
+#    if [ ! -e $f ]; then
+#        echo "$f does not exist"
+#        exit
+#    fi
+#done
+#
+#cd $build_execute_dir
 source $build_tools_dir/color_and_error.bash
 
 deps="java gjslint fixjsstyle html-builder read-data tidy"  # <-- not used
@@ -30,7 +53,11 @@ if [ ! -e "$COMPILER" ]; then
     echo 'Download from: http://closure-compiler.googlecode.com/files/compiler-latest.zip'
     error "$COMPILER does not exist"
 fi
-if [ ! -e "$(which tidy)" ]; then
+if [ ! $(which fixjsstyle) ]; then
+    echo 'sudo easy_install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz'
+    error 'fixjsstyle is not installed'
+fi
+if [ ! -e $(which tidy) ]; then
     error 'Tidy must be installed'
 fi
 
@@ -59,7 +86,7 @@ err(){
     exit 1
 }
 get-files(){
-    ini_files=$($build_tools_dir/read-data $config_file $1)
+    ini_files=$($build_tools_dir/read-data $config_file files $1)
     for f in $ini_files; do
         if [ ! -e $f ]; then
             echo "$f Does not exist."
@@ -116,12 +143,20 @@ dolint(){
 # rebuild app dir structure
 
 rebuild_dir(){
-    rm -rf dist/*
-    mkdir $distroot \
-          $distroot/js \
-          $distroot/css \
-          $distroot/css/images \
-          $distroot/images
+    title 'Build dist dir:'
+
+    if ! rm -rf $distroot/*; then
+        error "could not delete $distroot"
+    fi
+    ok "deleted: $distroot/*"
+
+    for f in js css css/images images; do
+        new=$distroot$f
+        if ! mkdir $new; then
+            error "could not create dir: $new"
+        fi
+        ok "created dir: $new"
+    done
 }
 
 
@@ -248,6 +283,8 @@ build_html(){
     destdir=$distroot
     parent_template='./app/html/html_templates/frame.html'
     html_assets=$(get-files html) || error $html_assets
+
+
 
     for f in $html_assets; do
         if $build_tools_dir/html-builder $f $parent_template $destdir \
