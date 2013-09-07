@@ -6,55 +6,37 @@ build_dir=$(dirname $0)
 cd $build_dir
 
 build_tools_dir=tools
-if [ ! -e $build_tools ]; then
-    echo "$build_tools does not exist"
+if [ ! -e $build_tools_dir ]; then
+    echo "build tools dir: $build_tools_dir does not exist"
     exit
 fi
+getdata=$build_tools_dir/read-data
 config_file=config.ini
 if [ ! -e $config_file ]; then
-    echo "$config_file does not exist"
+    echo "config file: $config_file does not exist"
     exit
 fi
-distroot=$($build_tools_dir/read-data $config_file files dist)
+distroot=$($getdata $config_file files dist)
+
 if [ ! -e $distroot ]; then
-    echo "$distroot does not exist"
+    echo "distroot: $distroot does not exist"
     exit
 fi
 output_file=build.log
 
-
-#exit
-#
-#build_execute_dir=%src_root%
-#
-#log_dir=$build_execute_dir/app/
-#build_tools_dir=$log_dir/tools/
-#config_file=$log_dir/config.ini
-#output_file=$log_dir/build.log
-#distroot=$build_execute_dir/dist/site
-#
-#for f in $build_execute_dir $log_dir $build_tools_dir \
-#         $config_file $output_file $distroot; do
-#    if [ ! -e $f ]; then
-#        echo "$f does not exist"
-#        exit
-#    fi
-#done
-#
-#cd $build_execute_dir
 source $build_tools_dir/color_and_error.bash
 
 deps="java gjslint fixjsstyle html-builder read-data tidy"  # <-- not used
 if [ ! -e "$(which java)" ]; then
     error 'Java must be installed to run the closure compiler'
 fi
-COMPILER=~/bin-apps/closure-compiler/compiler.jar
+COMPILER=$($getdata $config_file files js_compiler)
 if [ ! -e "$COMPILER" ]; then
     echo 'Download from: http://closure-compiler.googlecode.com/files/compiler-latest.zip'
-    error "$COMPILER does not exist"
+    error "compiler: $COMPILER does not exist"
 fi
 if [ ! $(which fixjsstyle) ]; then
-    echo 'sudo easy_install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz'
+    echo 'To install: sudo easy_install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz'
     error 'fixjsstyle is not installed'
 fi
 if [ ! -e $(which tidy) ]; then

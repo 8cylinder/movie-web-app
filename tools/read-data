@@ -17,6 +17,9 @@ def main(args):
     value = cf.get(args['<section>'], args['<value>'])
     value = value.strip()
 
+    if value.startswith('~'):
+        value = os.path.expanduser(value)
+
     print value
 
 
