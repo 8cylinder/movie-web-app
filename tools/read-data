@@ -17,8 +17,23 @@ def main(args):
     value = cf.get(args['<section>'], args['<value>'])
     value = value.strip()
 
-    if value.startswith('~'):
-        value = os.path.expanduser(value)
+    # Because the shell does not expand the tilde (~) key for the
+    # users home dir when its in a string, we do it here.  If the data
+    # does not look like a file, it *probably* will not be changed.
+    #
+    # One issue, if the path is meant for a non-local filesystem, it
+    # will still be expanded using the local user home dir, so to
+    # work around that, use a full path for a remote filesystem.
+    lines = []
+    values = value.split('\n')
+    for line in values:
+        if line.startswith('~'):
+            line = os.path.expanduser(line)
+        # normpath defaults to '.' if its an empty string,
+        # which we don't want.  So skip normpath if line empty.
+        if line: line = os.path.normpath(line)
+        lines.append(line)
+    value = '\n'.join(lines)
 
     print value
 
