@@ -285,10 +285,13 @@ build_html(){
     parent_template=$($getdata $config_file files "default parent template")
     html_assets=$(get-files html) || error $html_assets
 
+    template_root=$($getdata $config_file files template_dir)
+    app_name=$($getdata $config_file strings 'app name')
 
-
-    for f in $html_assets; do
-        if $build_tools_dir/html-builder $f $parent_template $destdir \
+    for content_html in $html_assets; do
+        if $build_tools_dir/html-builder $content_html $destdir $parent_template \
+            --var="app_name:$app_name" \
+            --var="template_root:$template_root" \
               >$output_file; then
             ok $f
         else
@@ -332,7 +335,7 @@ case $1 in
         compile-or-copy_vendor
         copy_css
         build_html
-        tidy_html
+        # tidy_html
 
         showtree
         ;;
