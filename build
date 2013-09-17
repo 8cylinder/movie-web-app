@@ -290,8 +290,8 @@ build_html(){
 
     for content_html in $html_assets; do
         if $build_tools_dir/html-builder $content_html $destdir $parent_template \
-            --var="app_name:$app_name" \
-            --var="template_root:$template_root" \
+            --var="app_name::$app_name" \
+            --var="template_root::$template_root" \
               >$output_file; then
             ok $f
         else

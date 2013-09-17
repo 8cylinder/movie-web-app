@@ -2,12 +2,17 @@
 
 '''
 HTML Builder
-------------
+
 Usage:
-  html-builder <filename> <destination> <defaultparent> [--var=<KEY:VALUE>...]
+  html-builder <filename> <destination> <defaultparent> [--var=<KEY::VALUE>...]
 
 Options:
-  --var=<KEY:VALUE>...  This can be specified multiple times
+  --var=<KEY::VALUE>...  This can be specified multiple times.  Note that
+  double colons must be used.
+
+Example:
+  html-builder content.html ~/projects/site ~/projects/src/html/ \
+  --var='name::John Brown' --var=phone::1234567
 
 filename, destination and defaultparent are required.
 
@@ -33,7 +38,7 @@ def main(args):
     vars = {}
     if args['--var']:
         for v in args['--var']:
-            kv = v.split(':')
+            kv = v.split('::')
             key = kv[0]
             value = kv[1]
             vars[key] = value
@@ -99,5 +104,4 @@ def main(args):
 if __name__ == '__main__':
 
     args = docopt(__doc__, version='0.1')
-    print args
     main(args)
