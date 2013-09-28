@@ -28,6 +28,12 @@ if [ ! -e $distroot ]; then
     echo "dist root: $distroot does not exist"
     exit
 fi
+srcroot=$($getdata $config_file files src)
+ if [ ! -e $srcroot ]; then
+    echo "src root: $srcroot does not exist"
+    exit
+fi
+
 output_file=build.log
 
 source $build_tools_dir/color_and_error.bash
@@ -88,7 +94,8 @@ get-files(){
 
 # ----------------------------------------------------
 verify(){
-    for type in html js css images vendor_js vendor_externs vendor_images; do
+    for type in html js css images vendor_js vendor_js_externs \
+                vendor_js_sourcemaps vendor_images; do
         title $type
         for f in $($getdata $config_file files $type); do
             if [ ! -e $f ]; then
@@ -99,7 +106,6 @@ verify(){
             fi
         done
     done
-
 }
 
 
@@ -161,63 +167,82 @@ rebuild_dir(){
 
 
 # ----------------------------------------------------
-compile_app(){
+compile_js(){
     title 'Compile app js:'
 
     js_assets=$(get-files js) || error $js_assets
     js="$distroot/js"
-    format='--formatting PRINT_INPUT_DELIMITER'
+    js_name='main.js'
+
+    # if fast, only concatenate js, don't use closure compiler
+    if [ "$1" == 'fast' ]; then
+        cat $js_assets > $js/$js_name
+        ok "FAST COMPILE - $js/$js_name"
+        return
+    fi
+
+    # if ! cp $js_assets $js; then
+    #     echo  "ERROR: Could not copy js_assets to $js:"
+    #     error "$js_assets"
+    # fi
+
+    # format='--formatting PRINT_INPUT_DELIMITER'
+    format=''
     if [ "$1" = 'pretty' ]; then
         format='--formatting PRINT_INPUT_DELIMITER --formatting PRETTY_PRINT'
     fi
 
-    #fastcompile='--compilation_level ADVANCED_OPTIMIZATIONS'
-    #if [ "$1" = 'fastcompile' ]; then
-    #    fastcompile=''
-    #fi
-
-    js_name='main.js'
-
-    if [ "$1" == 'fast' ]; then
-        cat $js_assets > $js/$js_name
-        ok "FAST COMPILE - $js/$js_name"
-        exit
+    if [ "$1" = 'fastcompile' ]; then
+        compilation_level='SIMPLE_OPTIMIZATIONS'
+    else
+        compilation_level='ADVANCED_OPTIMIZATIONS'
     fi
 
+    source_domain='http://moviesource.localhost/js/'
+    replace_string='\('
     # build [--js FILE ...etc.] list:
     for f in $js_assets; do
-        source_list="$source_list --js $f"
+        # build command line for compiler source list
+        source_list="$source_list --js $(basename $f)" # strip off the path
+
+        # build sed regex to change the sources filenames in
+        # main.js.map to use the source domain url
+        replace_string="$replace_string$(basename $f)\|"
     done
+    replace_string=$(echo $replace_string | sed 's/.$/)/')
 
     # externs extractor: http://www.dotnetwise.com/Code/Externs/index.html
     # prebuilt externs: http://code.google.com/p/closure-compiler/wiki/ExternsForCommonLibraries
     # https://code.google.com/p/closure-compiler/wiki/jQueryExpansions
 
-    vendor_externs=$(get-files vendor_externs) || error $vendor_externs
+    vendor_externs=$(get-files vendor_js_externs) || error $vendor_externs
     for f in $vendor_externs; do
         externs="$externs --externs $f"
     done
 
-    if java -jar $COMPILER \
-            --compilation_level ADVANCED_OPTIMIZATIONS \
+    # build needs to cd to the js dir to compile the js so the
+    # sources list in the map file do not have any paths attached
+    # to them
+    if $(cd js; java -jar $COMPILER \
+            --compilation_level $compilation_level \
             $format \
             $source_list \
-            --create_source_map $js/$js_name.sourcemap \
+            --create_source_map $js_name.map \
             $externs \
-            --js_output_file $js/$js_name \
-            > $output_file 2>&1
-            # 1>$output_file 2>$output_file;
+            --js_output_file $js_name)
     then
         if $(grep WARNING $output_file); then
             err $(cat $output_file)
         fi
 
-        # write the source map string to the compiled js
-        (echo; echo "//@ sourceMappingURL=$js_name.sourcemap") >> $js/$js_name
+        sed -i "s@$replace_string@$source_domain\1@g" js/$js_name.map
 
+        # write the source map string to the compiled js
+        (echo; echo -n "//# sourceMappingURL=/js/$js_name.map") >> $js_name
+
+        mv js/$js_name js/$js_name.map $js
         ok "$js/main.js"
     else
-        err $(cat $output_file)
         err 'compile error' " $js/$js_name"
     fi
 }
@@ -230,6 +255,10 @@ compile-or-copy_vendor(){
     vend_temp=vendor-UNCOMPILED.js
     vend_js=vendor.js
     vendor_libs=$(get-files vendor_js) || error $vendor_libs
+    #vendor_extras="$(get-files vendor_js_sourcemaps) $(get-files vendor_js_externs)" \
+    #              || error $vendor_extras
+    vendor_extras=$(get-files vendor_js_externs) || error $vendor_extras
+
     if [ $COMPILE_VENDOR = 'true' ]; then
         title 'Compile vendor js:'
         cat $vendor_libs > $js/$vend_temp
@@ -247,7 +276,7 @@ compile-or-copy_vendor(){
         fi
     else
         title 'Copy vendor js:'
-        if cp $vendor_libs $js; then
+        if cp $vendor_libs $vendor_extras $js; then
             for f in $vendor_libs; do
                 ok "$(basename $f)";
             done
@@ -293,10 +322,10 @@ build_html(){
             --var="app_name::$app_name" \
             --var="template_root::$template_root" \
               >$output_file; then
-            ok $f
+            ok $content_html
         else
             more $output_file
-            err 'compile error' $f
+            err 'compile error' $content_html
             exit 1
         fi
     done
@@ -331,7 +360,7 @@ case $1 in
     dev)
         dolint
         rebuild_dir
-        compile_app 'pretty'
+        compile_js fastcompile  # pretty, fast, fastcompile, nil
         compile-or-copy_vendor
         copy_css
         build_html
@@ -340,9 +369,10 @@ case $1 in
         showtree
         ;;
     fast)
+        rebuild_dir
         build_html
         copy_css
-        compile_app 'fast'
+        compile_js 'fast'
         compile-or-copy_vendor
 
         showtree
