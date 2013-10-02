@@ -1,0 +1,40 @@
+<template:title>Sort</template:title>
+<template:filename>sort.html</template:filename>
+
+
+<div data-role="header">
+  <h1>%%app_name%%</h1>
+</div>
+<div data-role="header">
+  <h1 class="sort_title">Sort list</h1>
+  <a href="#home" data-role="button" data-icon="arrow-l"
+	 data-direction="reverse">Back</a>
+</div>
+
+<div data-role="content" data-theme='a'>
+  <p>Choose how to sort your lists.</p>
+  <form id="sort_form" action="index.html" method="post">
+	<fieldset data-role="controlgroup">
+	  <label>
+		<input class="sort_by" type="radio" name="sort_by" value="title" />
+		Name
+	  </label>
+	  <label>
+		<input class="sort_by" type="radio" name="sort_by" value="dvd_release_date" />
+		Release dates
+	  </label>
+	  <label>
+		<input class="sort_by" type="radio" name="sort_by" value="rt_score" />
+		Rotten Tomatoes rating
+	  </label>
+	  <label>
+		<input class="sort_by" type="radio" name="sort_by" value="on_netflix" disabled />
+		Netflix availability
+	  </label>
+	  <label>
+		<input class="sort_by" type="radio" name="sort_by" value="on_itunes" disabled />
+		iTunes availability
+	  </label>
+	</fieldset>
+  </form>
+</div>

@@ -1,0 +1,27 @@
+<template:title>Lists</template:title>
+<template:filename>lists.html</template:filename>
+
+
+<div data-role="header">
+  <h1>%%app_name%%</h1>
+</div>
+<div data-role="header">
+  <a data-rel="back" id="lists_details"
+	 data-role="button" data-icon="arrow-l">Back</a>
+  <h1 class="lists_movie_title">Lists</h1>
+  <!--<a href="#home" id="lists_edit"
+	  data-role="button" data-icon="gear" >Edit</a>-->
+</div>
+
+<div data-role="content" data-theme='a'>
+
+  <p>Add or remove <span class="lists_movie_title"></span> from lists
+  you have created, or create a new list.  When you do that, the
+  movie will be automaticaly added to the list you created.</p>
+
+  <form id="lists_form" action="index.html" method="post">
+	<input type="text" name="lists_input" id="lists_input" placeholder="New movie list" />
+  </form>
+</div>
+
+<div id="lists_content" data-role="content" data-theme='a'></div>

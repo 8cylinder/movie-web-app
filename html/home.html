@@ -1,0 +1,45 @@
+<template:title>Home</template:title>
+<template:filename>home.html</template:filename>
+
+<!-- showcss: /home/sm/projects/movie/css/movie.sass -->
+<!-- home.js -->
+<div data-role="page" id="home">
+
+<div data-role="header">
+  <h1>%%app_name%%</h1>
+</div>
+
+<div data-role="header" id="title_header" data-theme="a">
+  <h1 id="title" data-lang="true">All Movies</h1>
+  <a href="search.html" data-role="button" class="ui-btn-right"
+     data-icon="arrow-r" data-iconpos="right" data-theme="a" data-lang="true">New</a>
+</div>
+
+<div id="content" data-role="content" data-theme="a" />
+<!--(delete-indentation)-->
+  <!-- {{! TEMPLATE BEGIN ========================= }} -->
+  <script id="movie_list_template" type="text/x-handlebars-template">
+    <ul id="movieul" data-role="listview" class="template">
+      {{#each movies}}
+      <li>
+        <h1>{{title}}</h1>
+        <span class="name">{{name}}</span>
+      </li>
+      {{/each}}
+    </ul>
+  </script>
+  <!-- {{! TEMPLATE END =========================== }} -->
+
+  <div class="new_flash">Delete this tag</div>
+
+<div data-role="footer" data-position="fixed" data-tap-toggle="false">
+  <div data-role="controlgroup" data-type="horizontal">
+    <a href="choose_list.html" data-role="button" id="lists">Lists</a>
+    <a href="sort.html" data-role="button" id="sort">Sort</a>
+    <a href="share.html" data-role="button" id="share">Share</a>
+    <a href="settings.html" data-role="button" id="settings">Settings</a>
+    <a href="help.html" data-role="button" id="help">Help</a>
+  </div>
+</div>
+
+</div>

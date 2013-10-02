@@ -1,0 +1,21 @@
+<template:title>Choose List</template:title>
+<template:filename>choose_list.html</template:filename>
+<template:parent>%%template_root%%/frame.html</template:parent>
+
+<div data-role="header">
+  <h1>%%app_name%%</h1>
+</div>
+<div data-role="header">
+  <a href="#home" data-role="button" data-icon="arrow-l"
+	 data-direction="reverse">Cancel</a>
+  <h1 class="choose_list_movie_title">Choose a list</h1>
+  <a href="#lists" id="choose_list_edit" data-role="button"
+	 data-icon="gear">Edit</a>
+</div>
+
+<div data-role="content" data-theme='a'>
+  <a href="#home" id="choose_list_all" data-listid="all" data-role="button"
+	 data-icon="arrow-r" data-iconpos="right"
+	 data-direction="reverse">Show all movies</a>
+  <span id="choose_list_content"></span>
+</div>
