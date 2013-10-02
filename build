@@ -181,12 +181,6 @@ compile_js(){
         return
     fi
 
-    # if ! cp $js_assets $js; then
-    #     echo  "ERROR: Could not copy js_assets to $js:"
-    #     error "$js_assets"
-    # fi
-
-    # format='--formatting PRINT_INPUT_DELIMITER'
     format=''
     if [ "$1" = 'pretty' ]; then
         format='--formatting PRINT_INPUT_DELIMITER --formatting PRETTY_PRINT'
@@ -211,10 +205,6 @@ compile_js(){
     done
     replace_string=$(echo $replace_string | sed 's/.$/)/')
 
-    # externs extractor: http://www.dotnetwise.com/Code/Externs/index.html
-    # prebuilt externs: http://code.google.com/p/closure-compiler/wiki/ExternsForCommonLibraries
-    # https://code.google.com/p/closure-compiler/wiki/jQueryExpansions
-
     vendor_externs=$(get-files vendor_js_externs) || error $vendor_externs
     for f in $vendor_externs; do
         externs="$externs --externs $f"
@@ -229,6 +219,7 @@ compile_js(){
             $source_list \
             --create_source_map $js_name.map \
             $externs \
+            --warning_level VERBOSE \
             --js_output_file $js_name)
     then
         if $(grep WARNING $output_file); then
@@ -237,11 +228,15 @@ compile_js(){
 
         sed -i "s@$replace_string@$source_domain\1@g" js/$js_name.map
 
-        # write the source map string to the compiled js
-        (echo; echo -n "//# sourceMappingURL=/js/$js_name.map") >> $js_name
+        if [ "$1" == "fake" ]; then
+            rm js/$js_name js/$js_name.map
+        else
+            # write the source map string to the compiled js
+            (echo; echo -n "//# sourceMappingURL=/js/$js_name.map") >> js/$js_name
 
-        mv js/$js_name js/$js_name.map $js
-        ok "$js/main.js"
+            mv js/$js_name js/$js_name.map $js
+            ok "$js/main.js"
+        fi
     else
         err 'compile error' " $js/$js_name"
     fi
@@ -360,7 +355,7 @@ case $1 in
     dev)
         dolint
         rebuild_dir
-        compile_js fastcompile  # pretty, fast, fastcompile, nil
+        compile_js fastcompile  # pretty, fast, fastcompile, fake, nil
         compile-or-copy_vendor
         copy_css
         build_html
@@ -392,6 +387,9 @@ case $1 in
     lint)
         dolint
         ;;
+    fakecompile)
+        compile_js fake
+        ;;
     verifysource)
         verify
         ;;
@@ -399,6 +397,6 @@ case $1 in
         if [ "$1" ]; then
             echo "Unknown command: $1"
         fi
-        echo "Usage: $(basename $0) [dev|prod|fast|compile_vendor|clean|lint|verifysource]"
+        echo "Usage: $(basename $0) [dev|prod|fast|compile_vendor|clean|lint|fakecompile|verifysource]"
 
 esac
