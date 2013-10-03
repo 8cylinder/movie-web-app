@@ -1,11 +1,9 @@
 
-$(document).delegate('#home', 'pageinit', function() {
+jQuery(document).delegate('#home', 'pageinit', function() {
 
   //c.init();
-  c.log('home.js', Config);
-  c.log('MovieList controller');
-
-  jQuery.noConflict();
+  C.log('home.js', Config);
+  C.log('MovieList controller');
 
   home.init();
   home.build_template();
@@ -48,4 +46,4 @@ var home = (function(pub, $, hb, c) {
   };
 
   return pub;
-})({}, jQuery, Handlebars, c);
+})({}, jQuery, Handlebars, C);
