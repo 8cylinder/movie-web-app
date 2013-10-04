@@ -38,11 +38,10 @@ var C = (function(pub, app) {
   return pub;
 })({}, Config);
 
-var set_page = (function(pub, config){
 
-})({}, Config);
+var set_page = function(page) {
 
-set_page = function() {
+  Store.put ('current_page', page);
 
 
 };
