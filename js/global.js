@@ -41,7 +41,7 @@ var C = (function(pub, app) {
 
 var set_page = function(page) {
 
-  Store.put ('current_page', page);
+  Store.put('current_page', page);
 
 
 };

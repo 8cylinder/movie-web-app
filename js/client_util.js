@@ -1,9 +1,10 @@
 
 
 /**
+ * @param {Array} list  An array of strings to add to the merged string
  * @return {string}  Creates a merged string.
  */
-String.prototype.merge = function() {
+String.prototype.merge = function(list) {
 
   var rep_val = '__';
   var str_arr = this.split(rep_val);
@@ -13,7 +14,7 @@ String.prototype.merge = function() {
 
   for (var i = 0; i < str_arr.length - 1; i++)
   {
-    insert = arguments[i];
+    insert = list[i];
     new_str = new_str + str_arr[i] + insert;
   }
 

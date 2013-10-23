@@ -2,35 +2,52 @@
 <template:filename>search.html</template:filename>
 
 
-<div data-role="header">
+<div>
   <h1>%%app_name%%</h1>
 </div>
-<div data-role="header" data-add-back-btn="true">
-  <a href="home.html" data-role="button" data-icon="arrow-l"
-	 data-direction="reverse">Home</a>
+<div>
+  <a href="home.html">Home</a>
   <h1>Search</h1>
 </div>
 
 <!-- Search UI -->
-<div data-role="content" data-theme="a">
-  <div id="search_panel" style="margin-bottom: 30px;"  data-theme="a">
+<div>
+  <div id="search_panel">
 	<p>Search for a movie using the name or partial name:</p>
 	<form id="search_form" action="index.html" method="post">
-	  <label for="search_input" class="ui-hidden-accessible">Movie name</label>
+	  <label for="search_input">Movie name</label>
 	  <input type="search" name="search_input" id="search_input" placeholder="Movie name"/>
 	</form>
   </div>
 
   <p>Or browse whats currently in theaters or whats coming soon:</p>
-  <div class="ui-grid-a">
-	<div class="ui-block-a">
-	  <input data-mini="true" type="button" value="In Theaters" id="search_intheaters" />
-	</div>
-	<div class="ui-block-b">
-	  <input data-mini="true" type="button" value="Coming Soon" id="search_comingsoon" />
-	</div>
-  </div>
+  <input type="button" value="In Theaters" id="search_intheaters" />
+  <input type="button" value="Coming Soon" id="search_comingsoon" />
 </div>
 <!-- End Search UI -->
 
-<div id="search_content" data-role="content"></div>
+<div id="search_content"></div>
+
+<script id="search_list_template" type="text/x-handlebars-template">
+ {{#if movies}}
+  <ul id="search_list">
+	{{#movies}}
+	<li class="list_items" id="{id}">
+	  <a href="">
+		<img src="{posters.thumbnail}" alt="poster" class="poster_thumbnail" />
+		<h1>{{title}} ({{year}})</h1>
+		<p>{{ratings.critics_score}}</p>
+		<p>{{synopsis}}</p>
+	  </a>
+	</li>
+	{{/movies}}
+  </ul>
+ {{else}}
+  <ul id="search_list">
+	<li class="box">
+	  <h1>No movies match your search.</h1>
+	</li>
+  </ul>
+ {{/if}}
+
+</script>

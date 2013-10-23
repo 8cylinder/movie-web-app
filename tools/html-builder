@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
-'''
-HTML Builder
-
+r'''
 Usage:
   html-builder <filename> <destination> <defaultparent> [--var=<KEY::VALUE>...]
 
 Options:
   --var=<KEY::VALUE>...  This can be specified multiple times.  Note that
-  double colons must be used.
+                         double colons must be used.
 
 Example:
-  html-builder content.html ~/projects/site ~/projects/src/html/ \
-  --var='name::John Brown' --var=phone::1234567
+  html-builder --var='name::John Brown' --var=phone::1234567 \
+  content.html ~/projects/site ~/projects/src/html/
 
 filename, destination and defaultparent are required.
 
