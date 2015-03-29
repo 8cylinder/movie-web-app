@@ -1,0 +1,257 @@
+//build: movie-app  exclude: sm/compile-sass
+//sass-style: expanded
+
+$textcolor: #858585
+$darkertext: #444444
+$paleblue: #E4E9F4
+$font: "Source Sans Pro" "helvetica neue" sans-serif
+*
+    margin: 0
+    font-family: $font
+
+.ui-overlay-a, .ui-page-theme-a, .ui-page-theme-a, .ui-panel-wrapper
+    color: white
+    text-shadow: none
+    /*font-family: $font
+    /*font-weight: 100
+
+/* override jquery mobiles's */
+.ui-input-btn input
+    border: 1px solid #23345B
+    background: #8898BC
+    border-radius: 6px
+search
+    border: 1px solid #23345B
+    background: #EFF1F7
+
+
+.ui-btn
+    font-family: $font
+    font-weight: 400 !important
+
+.ui-page
+    background-color: #3C3C3C
+a:visited
+    color: $darkertext !important
+
+.sticky
+    position: fixed
+    top: 0
+    height: 20px
+    width: 100%
+    z-index: 1
+
+.header
+    width: 100%
+    height: 90px
+    background-color: #FFF
+    background-image: url('../images/star.png')
+    background-size: 130px
+    background-repeat: no-repeat
+    /*background-position: 40px;
+    background-position: 20%
+    color: $textcolor
+    font-weight: 100
+    font-size: 50px
+    text-align: center
+    span
+        letter-spacing: -2px
+        position: relative
+        top: 20px
+        /*font-family: $font-light
+
+.list_title
+    height: 20px
+    font-size: 18px
+    color: $darkertext
+    padding: 5px 15px
+    background: -webkit-radial-gradient(130px 0, circle, rgba(255, 221, 0, 0.18) 0%, rgba(0, 0, 0, 0) 60%) $paleblue
+    .sort_button
+        float: right
+        font-weight: 300
+
+/************************** Home movie list **************************/
+#home_content
+    .thumbnail
+        float: left
+    .movie
+        top: 0
+        bottom: 0
+        left: 0
+        right: 0
+        height: 84px
+        border-bottom: 1px solid black
+        color: white
+        /*overflow: hidden
+        z-index: 0
+        padding: 8px 20px
+    .blur
+        position: absolute
+        display: block
+        height: 100px
+        left: 60px
+        right: 0
+        z-index: -1
+        top: 0
+        background-size: cover
+        background-position: 0px 30%
+        /*overflow: hidden
+        /*filter: blur(20px)
+        /*-webkit-filter: blur(30px)
+        -webkit-clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)
+    .itemcontainer
+        position: relative
+        background-color: #353535
+        text-size: 20px
+        z-index: 0
+.listcontainer
+    text-shadow: none
+    font-weight: 200
+.title_row
+    margin-bottom: 5px
+.title
+    font-size: 25px
+    font-weight: 300
+.year
+    font-size: 6px
+    display: table-cell
+    white-space: nowrap
+.small_title
+    font-weight: 400
+.clip
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+
+/****************************** details ******************************/
+#details
+    background-color: rgba(0, 0, 0, 0)
+#details_content
+    font-weight: 300
+    font-size: 17px
+    /*text-shadow: none
+    /*color: white
+    /*margin: 10px 20px
+    padding: 17px 20px
+    position: inherit
+    background-color: #000
+    height: 100%
+    z-index: -1
+    p
+        margin-bottom: 8px
+    /*.title_row
+        margin-bottom: -5px
+    .title
+        font-size: 30px
+        font-weight: 400
+        margin-bottom: -2px
+    .year
+        font-size: 12px
+    .small_title
+        font-weight: 500
+    .blur
+        position: fixed
+        top: 0
+        height: 100%
+        width: 100%
+        z-index: -1
+        background-size: cover
+        background-position-x: center
+        filter: blur(20px)
+        -webkit-filter: blur(30px)
+    img
+        float: left
+        margin-right: 9px
+        margin-bottom: 3px
+    blockquote
+        padding-left: 10px
+    .release_dates
+        clear: both
+        margin-bottom: 0px
+    .director
+        margin-bottom: 15px
+    .director_name
+        font-weight: 500
+
+/******************************* search *******************************/
+
+.search_controls
+    font-weight: 300
+    font-size: 17px
+    /*text-shadow: none
+    color: black
+    /*margin: 10px 20px
+    padding: 10px 20px
+    background-color: #E0E6F2
+    background: -webkit-radial-gradient(130px 0, circle, rgba(255, 221, 0, 0.18) 0%, rgba(0, 0, 0, 0) 60%) $paleblue
+
+#search_content
+    p
+        margin-bottom: 5px
+    .thumbnail
+        float: left
+        margin-right: 10px
+        margin-bottom: 3px
+        margin-top: 5px
+    .search_movie
+        border-bottom: 1px solid black
+        color: white
+        padding: 8px 20px
+        background-color: #353535
+        text-size: 20px
+.ui-input-btn, .ui-btn, input
+    font-weight: 400
+    font-family: $font
+.not_found
+    margin: 20px
+    text-align: center
+
+/******************************** sort ********************************/
+
+#sort
+    background-color: white
+    color: $darkertext
+
+/******************************* footer *******************************/
+.footer
+    @media only screen and (max-width: 370px)
+        -webkit-transform: scale(0.79)
+        bottom: -7px
+    position: fixed
+    bottom: 0
+    width: 100%
+    img
+        display: block
+        width: 900px
+        left: 50%
+        position: relative
+        -webkit-transform: translateX(-50%)
+    .links
+        z-index: 1
+        width: 0
+        height: 0
+        left: 50%
+        position: absolute
+        bottom: 35px
+    .text
+        font-size: 18px
+        font-family: $font
+        font-weight: 400
+        position: absolute
+        text-decoration: none
+        color: $darkertext
+
+
+    #plus
+        font-size: 71px
+        font-weight: 100
+        bottom: -53px
+        left: -16px
+    #lists
+        right: 126px
+    #share
+        right: 55px
+    #settings
+        left: 53px
+    #help
+        left: 136px
