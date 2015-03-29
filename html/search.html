@@ -1,53 +1,58 @@
-<template:title>Search</template:title>
-<template:filename>search.html</template:filename>
-
-
-<div>
-  <h1>%%app_name%%</h1>
-</div>
-<div>
-  <a href="home.html">Home</a>
-  <h1>Search</h1>
-</div>
-
-<!-- Search UI -->
-<div>
-  <div id="search_panel">
-	<p>Search for a movie using the name or partial name:</p>
-	<form id="search_form" action="index.html" method="post">
-	  <label for="search_input">Movie name</label>
-	  <input type="search" name="search_input" id="search_input" placeholder="Movie name"/>
-	</form>
+<template:title>%%app_name%%</template:title>
+<template:filename>build.html</template:filename>
+<template:parentblock>[search]</template:parentblock>
+<template:parent>build.html</template:parent>
+<!-- exclude: sm/compile-html  build: movie-app -->
+<div data-role="page" id="search">
+  [insert:html/html_templates/header.html]
+  <!-- Search UI -->
+  <div class="search_controls">
+    <div id="search_panel">
+	  <p>Search for a movie using the name or partial name:</p>
+	  <form id="search_form" action="index.html" method="post">
+	    <!-- <label for="search_input">Movie name</label> -->
+	    <input type="search" name="search_input" id="search_input" placeholder="Movie name"/>
+	  </form>
+    </div>
+    <p>Or browse whats currently in theaters or whats coming soon:</p>
+    <fieldset class="ui-grid-a">
+      <div class="ui-block-a"><input type="button" value="In Theaters" id="search_intheaters" /></div>
+      <div class="ui-block-b"><input type="button" value="Coming Soon" id="search_comingsoon" /></div>
+    </fieldset>
   </div>
+  <!-- End Search UI -->
 
-  <p>Or browse whats currently in theaters or whats coming soon:</p>
-  <input type="button" value="In Theaters" id="search_intheaters" />
-  <input type="button" value="Coming Soon" id="search_comingsoon" />
+  <div id="search_content"></div>
+  [insert:html/html_templates/footer.html]
 </div>
-<!-- End Search UI -->
-
-<div id="search_content"></div>
 
 <script id="search_list_template" type="text/x-handlebars-template">
- {{#if movies}}
-  <ul id="search_list">
+  {{#if movies}}
+  <div id="search_list" class="listcontainer">
 	{{#movies}}
-	<li class="list_items" id="{id}">
-	  <a href="">
-		<img src="{posters.thumbnail}" alt="poster" class="poster_thumbnail" />
-		<h1>{{title}} ({{year}})</h1>
-		<p>{{ratings.critics_score}}</p>
-		<p>{{synopsis}}</p>
-	  </a>
-	</li>
-	{{/movies}}
-  </ul>
- {{else}}
-  <ul id="search_list">
-	<li class="box">
-	  <h1>No movies match your search.</h1>
-	</li>
-  </ul>
- {{/if}}
+    <div id="{{id}}" class="search_movie">
+      <div class="title_row clip">
+        <span class="title">{{title}}</span>
+        <!-- <span class="year">({{year}})</span> -->
+      </div>
+      <p class="release_dates clip">
+        <span class="small_title">DVD:</span> {{release_dates.dvd}},
+        <span class="small_title">Theater:</span> {{release_dates.theater}}
+      </p>
+      <p class="rt_scores clip">
+        <span class="small_title">RT Score:</span> {{ratings.critics_score}},
+        {{ratings.critics_rating}}
+      </p>
+      <img src="{{posters.thumbnail}}" class="thumbnail" width="60" height="100">
+	  <p>{{synopsis}}</p>
+    </div>
+  {{/movies}}
+  </div>
+</div>
+{{else}}
+<div id="search_list" class="not_found">
+  <p>No movies match your search.</p>
+</div>
+{{/if}}
 
 </script>

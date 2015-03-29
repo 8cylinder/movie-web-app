@@ -1,10 +1,13 @@
-<template:title>Start</template:title>
-<template:filename>index.html</template:filename>
+<template:title>%%app_name%%</template:title>
+<template:filename>build.html</template:filename>
+<template:parentblock>[app_start]</template:parentblock>
+<template:parent>build.html</template:parent>
+<!-- exclude: sm/compile-html  build: movie-app -->
 
-<!-- init.js -->
-<div data-role="page" id="init">
-  <div id="content" data-role="content" data-theme="a">
+<div data-role="page" id="index">
+  <!-- init.js -->
+  <div id="content">
     <p>Welcome to %%app_name%%.</p>
-    <a href="home.html" data-role="button">Begin</a>
+    <a href="#home">Begin</a>
   </div>
 </div>

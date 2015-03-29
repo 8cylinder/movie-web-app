@@ -18,10 +18,10 @@ var is an optional key:value formated string that contains replacement
 values for placeholder strings in the html file.  The placeholder
 looks like this: %%placeholder%%
 
-filename:        Source filename
-destination:     Destination directory for compiled html
-default parent:  The parent html template to use if its not
-                 specified in the <template:filename> tag
+filename:       Source filename
+destination:    Destination directory for compiled html
+defaultparent:  The parent html template to use if its not
+                specified in the <template:parent> tag
 '''
 
 import re, sys
@@ -54,6 +54,16 @@ def main(args):
             if val == m.group(1):
                 content = content.replace(m.group(), vars[val])
 
+    # insert any files
+    for m in re.finditer(r'\[insert:(.*?)\]', content):
+        insert_file_name = m.group(1)
+        insert = open(insert_file_name).read()
+        content = content.replace(r'[insert:%s]' % insert_file_name, insert)
+
+    # the default section the content gets inserted into in the parent file.
+    # It can be overridden with the <template:parentblock> tag in the child.
+    parent_block = '[content]'
+
     # extract the values from the tags in the html file
     tag_values = {}
     all_matches = re.finditer(r'<template:(.*?)>(.*?)</template:\1>', content)
@@ -66,9 +76,11 @@ def main(args):
             content_filename = tag_value # override command line
         elif tag_name == 'parent':
             parent_filename = tag_value # override command line
+        elif tag_name == 'parentblock':
+            parent_block = tag_value
         else:
             tag_values[tag_name] = tag_value
-
+    #print content_filename, parent_filename, parent_block
     # read the parent html file
     try:
         frame = open(parent_filename).read()
@@ -84,12 +96,11 @@ def main(args):
 
     # insert the content into the parent
     content = content.strip()
-    full = frame.replace('[content]', content)
-
+    full = frame.replace(parent_block, content)
+    #print full
     for v in tag_values:
         dest_tag = '[%s]' % v
         full = full.replace(dest_tag, tag_values[v])
-
 
     # write the full html to the file system
     dest = open(destination + '/' + content_filename, 'w')

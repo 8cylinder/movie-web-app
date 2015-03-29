@@ -1,22 +1,43 @@
-<template:title>Details</template:title>
-<template:filename>details.html</template:filename>
+<template:title>%%app_name%%</template:title>
+<template:filename>build.html</template:filename>
+<template:parentblock>[details]</template:parentblock>
+<template:parent>build.html</template:parent>
+<!-- exclude: sm/compile-html  build: movie-app -->
 
-
-<div data-role="header">
-  <h1>%%app_name%%</h1>
-</div>
-<div id="details_header" data-role="header">
-  <h1>Details</h1>
-  <!--<a href="#home" data-rel="back" data-role="button" data-icon="arrow-l" data-direction="reverse">Back</a>-->
-  <a href="#home" data-role="button" data-icon="arrow-l"
-	 data-direction="reverse">Back</a>
+<div data-role="page" id="details">
+  <div id="details_content"></div>
+  [insert:html/html_templates/footer.html]
 </div>
 
-<div id="details_content" data-role="content" data-theme='a'></div>
-<div id="details_lists" data-role="content" data-theme='a'>
-  <div class="lists_lists_border">
-	<a href="#lists" id="details_to_lists" data-role="button">Edit lists</a>
-	<div id="details_lists_list"></div>
+<script id="details_template" type="text/x-handlebars-template">
+  {{#movie}}
+  <div>
+    <div class="title_row">
+      <span class="title">{{title}}</span>
+      <!-- &nbsp; <span class="year">({{year}})</span> -->
+    </div>
+    <p class="director">Directed by <span class="director_name">{{formated_directors}}</span></p>
+    <img src="{{posters.thumbnail}}">
+    <p class="cast"><span class="small_title">Cast:</span> {{formated_cast}}</p>
+    <p class="release_dates"><span class="small_title">Release dates:</span>
+      <blockquote>
+      <span class="small_title">DVD:</span> {{release_dates.dvd}}<br>
+      <span class="small_title">Theater:</span> {{release_dates.theater}}
+      </blockquote>
+    </p>
+    <p class="rt_scores">
+      <span class="small_title">RT Score:</span> {{ratings.critics_score}},
+      {{ratings.critics_rating}}
+    </p>
+    <p>{{synopsis}}</p>
+    <div id="bottompadding" style="height:90px"></div>
+
   </div>
-</div>
-</div>
+  <div class="blur"
+       style="background-image: url({{posters.thumbnail}});
+              background-color: #787878;
+              background-blend-mode: multiply;"></div>
+
+
+  {{/movie}}
+</script>

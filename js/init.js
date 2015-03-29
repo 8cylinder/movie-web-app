@@ -1,3 +1,4 @@
+//build: movie-app
 // pageinit
 
 
@@ -20,7 +21,7 @@ var xms = (function() {
   //
   // user click ok to continue to home
 
-})();
+}());
 
 
 var x = {

@@ -1,49 +1,73 @@
+//build: movie-app
+jQuery(document).on("pagecreate", '#home', function(event){
+  C.log('pagecreate #home')
 
-jQuery(document).delegate('#home', 'pageinit', function() {
+  home.show_movies();
 
-  //c.init();
-  C.log('home.js', Config);
-  C.log('MovieList controller');
+  /* Does not work on mobile well.
+   *
+  jQuery('body').on(
+  {'touchmove': function() {
+     //C.log('in stick')
+     var fix = '#home_list_title';
+     var fix_class = 'sticky';
 
-  home.init();
-  home.build_template();
+     var nav_height = 90; //jQuery(window).height() - 20;
+     C.log(nav_height, jQuery(window).scrollTop())
 
+     if (jQuery(window).scrollTop() > nav_height) {
+       jQuery(fix).addClass(fix_class);
+     } else {
+       jQuery(fix).removeClass(fix_class);
+      }
+    }
+  }); */
+
+});
+/*jQuery(document).on("pagecontainercreate", function(event, ui){
+  C.log('PC Create', ui.toPage, ui.prevPage);
+  //C.log('#home')
+  //Config.set_page(Pages.home);
+  //home.show_movies();
+});*/
+
+jQuery(document).on('pagecontainershow', function(event, ui){
+  //C.log('PC Show', ui.toPage[0].id); //ui.toPage, ui.prevPage);
+  if (ui.toPage[0].id == Pages.home){
+    Config.set_page(Pages.home);
+  }
+  jQuery('#movieul').sortable({
+    handle: '.handle',
+    axis: 'y',
+    //containment: "window",
+    scrollSensitivity: 100
+  });
+  //jQuery('#movieul').disableSelection();
 });
 
 
-var home = (function(pub, $, hb, c) {
 
-  pub.init = function() {
-    c.log('ms.init()');
-  };
-
-  pub.generate_list = function() {
-    var mlist = [];
-    for (var i = 0; i < 5; i++) {
-      var rand = Math.floor(Math.random() * 100000);
-      for (var j = 0; j < 5; j++) {
-        rand += rand + ' ';
-      }
-      mlist[mlist.length] = {
-        'title': 'this is title',
-        'name': rand
-      };
-    }
-    return mlist;
-  };
-
-  pub.build_template = function() {
-    var data = {
-      'movies': pub.generate_list()
-    };
+var home = (function(pub, $, hb, c, movies, config)
+{
+  pub.show_movies = function() {
+    var data = movies.get_all();
     var source = $('#movie_list_template').html();
     var template = hb.compile(source);
-    var html = template(data);
+    var html = template({'movies':data});
+    //c.log(data, source, template, html)
+    $('#home_content').html(html);
 
-    //c.log(source, template, data, html);
-
-    $('#content').html(html);
+    pub.bind_events();
   };
 
+  pub.bind_events = function(){
+    $('.itemcontainer').on('tap', function(){
+      c.log(this.id)
+      var detail_id = this.id;
+      config.set_details_id(detail_id);
+      $('body').pagecontainer('change', '#details');
+      //window.location = Pages.details + '?' + detail_id;
+    });
+  };
   return pub;
-})({}, jQuery, Handlebars, C);
+})({}, jQuery, Handlebars, C, Movies, Config);

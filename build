@@ -1,59 +1,72 @@
 #!/usr/bin/env bash
 
-quiet=$2;
+#http://www.davidpashley.com/articles/writing-robust-shell-scripts/
+#set -o nounset
+set -o errexit
 
+quiet=$2;
+PATH=~/bin:/user/local/bin:$PATH
 build_dir=$(dirname $0)
 cd $build_dir
-
+is_missing=false
 build_tools_dir=tools
 if [ ! -e $build_tools_dir ]; then
     echo "build tools dir: $build_tools_dir does not exist"
-    exit
+    echo
+    is_missing=true
 fi
-
 getdata=$build_tools_dir/read-data
 if [ ! -e $getdata ]; then
     echo "read-data: $getdata does not exist"
-    exit
+    echo
+    is_missing=true
 fi
-
 config_file=config.ini
 if [ ! -e $config_file ]; then
     echo "config file: $config_file does not exist"
-    exit
+    echo
+    is_missing=true
 fi
-
 distroot=$($getdata $config_file files dist)
 if [ ! -e $distroot ]; then
     echo "dist root: $distroot does not exist"
-    exit
+    echo
+    is_missing=true
 fi
 srcroot=$($getdata $config_file files src)
- if [ ! -e $srcroot ]; then
+if [ ! -e $srcroot ]; then
     echo "src root: $srcroot does not exist"
+    echo
+    is_missing=true
+fi
+if ! type java >/dev/null 2>&1; then
+    echo 'Java must be installed to run the closure compiler'
+    is_missing=true
+fi
+COMPILER=$($getdata $config_file files js_compiler)
+if [ ! -e "$COMPILER" ]; then
+    echo "compiler: $COMPILER does not exist"
+    echo 'Download from: http://dl.google.com/closure-compiler/compiler-latest.zip'
+    is_missing=true
+fi
+if ! type /usr/local/bin/fixjsstyle >/dev/null 2>&1; then
+    echo 'fixjsstyle is not installed'
+    echo 'To install: sudo easy_install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz'
+    echo
+    is_missing=true
+fi
+if ! type tidy >/dev/null 2>&1; then
+    echo 'Tidy must be installed'
+    echo
+    is_missing=true
+fi
+
+if [[ $is_missing == 'true' ]]; then
     exit
 fi
 
 output_file=build.log
-
 source $build_tools_dir/color_and_error.bash
-
-deps="java gjslint fixjsstyle html-builder read-data tidy"  # <-- not used
-if [ ! -e "$(which java)" ]; then
-    error 'Java must be installed to run the closure compiler'
-fi
-COMPILER=$($getdata $config_file files js_compiler)
-if [ ! -e "$COMPILER" ]; then
-    echo 'Download from: http://closure-compiler.googlecode.com/files/compiler-latest.zip'
-    error "compiler: $COMPILER does not exist"
-fi
-if [ ! $(which fixjsstyle) ]; then
-    echo 'To install: sudo easy_install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz'
-    error 'fixjsstyle is not installed'
-fi
-if [ ! -e $(which tidy) ]; then
-    error 'Tidy must be installed'
-fi
 
 COMPILE_VENDOR='false'
 if [ "$2" == 'compile_vendor' ]; then
@@ -93,9 +106,10 @@ get-files(){
 
 
 # ----------------------------------------------------
+# make sure all files listed in config.ini exist
 verify(){
     for type in html js css images vendor_js vendor_js_externs \
-                vendor_js_sourcemaps vendor_images; do
+                vendor_js_sourcemaps; do
         title $type
         for f in $($getdata $config_file files $type); do
             if [ ! -e $f ]; then
@@ -281,6 +295,16 @@ compile-or-copy_vendor(){
     fi
 }
 
+# ----------------------------------------------------
+# sass will compile all sass files in a dir so we don't
+# need to specify each sass file in the config.ini, just
+# the dir
+compile_sass(){
+    title 'Compile SASS:'
+    style=$1 # must be one of: nested (default), compact, compressed, or expanded
+    sass_assets=$(get-files sass) || error $sass_assets
+    sass --update --force --sourcemap=none --style=$style $sass_assets
+}
 
 # ----------------------------------------------------
 copy_css(){
@@ -291,15 +315,18 @@ copy_css(){
     else
         err $css_assets
     fi
-
-    vendor_images=$(get-files vendor_images) || error $vendor_images
-    if cp $vendor_images "$distroot/css/images"; then
-        ok $vendor_images
-    else
-        err $vendor_images
-    fi
 }
 
+# ----------------------------------------------------
+copy_images(){
+    title 'Copy Images:'
+    image_assets=$(get-files images) || error $image_assets
+    if cp $image_assets "$distroot/images"; then
+        ok $image_assets
+    else
+        err $image_assets
+    fi
+}
 
 # ----------------------------------------------------
 build_html(){
@@ -308,12 +335,17 @@ build_html(){
     destdir=$distroot
     parent_template=$($getdata $config_file files "default parent template")
     html_assets=$(get-files html) || error $html_assets
+    build_html=$(get-files app_html) || error $build_html
 
     template_root=$($getdata $config_file files template_dir)
     app_name=$($getdata $config_file strings 'app name')
 
+    cp $parent_template ./build.html
+
     for content_html in $html_assets; do
-        if $build_tools_dir/html-builder $content_html $destdir $parent_template \
+        # sed -i '1s/^/<!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX -->\n/' $content_html
+        if $build_tools_dir/html-builder $content_html . ./build.html \
+            --var="build_html::build.html" \
             --var="app_name::$app_name" \
             --var="template_root::$template_root" \
               >$output_file; then
@@ -324,8 +356,8 @@ build_html(){
             exit 1
         fi
     done
+    cp build.html $destdir/index.html
 }
-
 
 # ----------------------------------------------------
 tidy_html(){
@@ -355,22 +387,28 @@ case $1 in
     dev)
         dolint
         rebuild_dir
-        compile_js fastcompile  # pretty, fast, fastcompile, fake, nil
+        compile_js 'fastcompile'  # pretty, fast, fastcompile, fake, nil
         compile-or-copy_vendor
+        compile_sass
         copy_css
+        copy_images
         build_html
-        # tidy_html
+        tidy_html
 
         showtree
         ;;
     fast)
         rebuild_dir
         build_html
+        compile_sass 'expanded'
         copy_css
+        copy_images
         compile_js 'fast'
         compile-or-copy_vendor
 
-        showtree
+        # showtree
+        cp test.html $distroot
+
         ;;
     prod)
         echo 'Not implemented yet'
