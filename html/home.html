@@ -7,13 +7,15 @@
 <!-- home.js -->
 <div data-role="page" id="home">
   [insert:html/html_templates/header.html]
-  <div id="home_list_title" class="list_title">
-    <span id="list_name" class="list_name">All Movies</span>
-    <a href="#sort" id="sort_link" class="sort_button">Sort</a>
+  <div class="list_title">
+    <div id="home_list_title" class="xlist_title">
+      <span id="list_name" class="list_name">All Movies</span>
+      <a href="#sort" id="sort_link" data-transition="slideup" class="sort_button underline">Sort</a>
+    </div>
+    <div id="home_list_description" class="home_list_description"></div>
   </div>
 
   <div id="home_content"></div>
-  <div id="bottompadding" style="height:50px"></div>
   [insert:html/html_templates/footer.html]
 </div>
 <!-- {{! TEMPLATE BEGIN ========================= }} -->
@@ -23,8 +25,8 @@
     {{#movies}}
     <div class="itemcontainer" id="{{id}}">
       <img src="{{posters.thumbnail}}" class="thumbnail" width="60" height="100">
-      <div class="handle" style="float:right;padding:20px;background-color:red">drag</div>
-      <div class="movie">
+      <!-- <div class="handle" style="float:right;padding:20px;background-color:red">drag</div> -->
+      <div id="{{id}}" class="movie">
         <div class="title_row clip">
           <span class="title">{{title}}</span>
           <!-- <span class="year">({{year}})</span> -->
@@ -39,16 +41,40 @@
         </p>
       </div>
       <div class="blur"
-           style="background-image: url({{posters.thumbnail}});
-                  background-color: #787878;
-                  background-blend-mode: multiply;"></div>
+           style="background-image: url({{posters.thumbnail}});"></div>
+      <div class="home_lists"></div>
     </div>
     {{/movies}}
   </div>
   {{else}}
   <div id="search_list" class="not_found">
-    <p>Tap the '+' at the bottom of the screen to search for movies.</p>
+    <p class="title">Welcome to %%app_name%%<span class="fancy">!</span></p>
+    <p>Tap the '+' at the bottom of the screen to start adding movies to your list.</p>
+    <p>Tap the 'Lists' at the bottom to create different lists that you can then add movies to.</p>
   </div>
   {{/if}}
 </script>
+
+<script id="home_list_template" type="text/x-handlebars-template">
+  <table width="100%" class="home_drop_down">
+    <!-- <tr>
+    <td><div class="small_title">Lists this movie is a part of</div></td>
+    <td><div class="small_title">Delete</div></td>
+    </tr> -->
+    <tr>
+      <td width="66%">
+        {{#if lists}}
+        {{#lists}}
+        <div class="home_list_item {{cssstate}}" data-state="{{state}}" id="{{id}}">{{title}}</div>
+        {{/lists}}
+        {{else}}
+        <p>There are no lists. <a href="#lists">Tap here to create some new lists.</a></p>
+        {{/if}}
+      </td>
+      <td width="33%" class="delete_td">
+        <div class="home_delete">Delete movie</div>
+      </td>
+    </tr></table>
+</script>
+
 <!-- {{! TEMPLATE END =========================== }} -->

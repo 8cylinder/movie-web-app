@@ -2,11 +2,10 @@
 // pageinit
 
 
-jQuery(document).delegate('#init', 'pageinit', (function() {
-  C.log('Page: #init');
-  C.log('Config:', Config);
-
-}));
+// jQuery(document).delegate('#init', 'pageinit', (function() {
+//   C.log('Page: #init');
+//   C.log('Config:', Config);
+// }));
 
 
 
@@ -22,15 +21,3 @@ var xms = (function() {
   // user click ok to continue to home
 
 }());
-
-
-var x = {
-  somevar: 'x',
-
-  /**
-   * @param value  value to be logged
-   */
-  init: function(value) {
-    C.log('cow');
-  }
-};

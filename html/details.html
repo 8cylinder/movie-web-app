@@ -6,6 +6,8 @@
 
 <div data-role="page" id="details">
   <div id="details_content"></div>
+  <!-- <div id="details_list_content"></div> -->
+
   [insert:html/html_templates/footer.html]
 </div>
 
@@ -29,15 +31,9 @@
       <span class="small_title">RT Score:</span> {{ratings.critics_score}},
       {{ratings.critics_rating}}
     </p>
-    <p>{{synopsis}}</p>
-    <div id="bottompadding" style="height:90px"></div>
-
-  </div>
+    <p id="details_synopsis"></p>
+   </div>
   <div class="blur"
-       style="background-image: url({{posters.thumbnail}});
-              background-color: #787878;
-              background-blend-mode: multiply;"></div>
-
-
+       style="background-image: url({{posters.thumbnail}});"></div>
   {{/movie}}
 </script>

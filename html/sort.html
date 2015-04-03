@@ -6,26 +6,47 @@
 
 
 <div data-role="page" id="sort">
-  <p>Choose how to sort this list.</p>
-  <form id="sort_form" action="index.html" method="post">
-    <fieldset data-role="controlgroup">
-      <label>
-        <input class="sort_by" type="radio" name="sort_by" value="title" />
-        Name
-      </label>
-      <label>
-        <input class="sort_by" type="radio" name="sort_by" value="dvd_release_date" />
-        Release dates
-      </label>
-      <label>
-        <input class="sort_by" type="radio" name="sort_by" value="rt_score" />
-        Rotten Tomatoes rating
-      </label>
-      <label>
-        <input class="sort_by" type="radio" name="sort_by" value="manual" />
+  <div class="search_controls">
+    <p id="sort_list_title" class="title"></p>
+    <p>Choose how to sort this list.</p>
+    <form id="sort_form" action="index.html" method="post">
+      <fieldset>
+        <label>
+          <input id="sort_title" class="sort_by" type="radio" name="sort_by" value="title" />
+          Name
+        </label>
+        <label>
+          <input id="sort_dvd" class="sort_by" type="radio" name="sort_by" value="dvd" />
+          DVD release dates
+        </label>
+        <label>
+          <input id="sort_theater" class="sort_by" type="radio" name="sort_by" value="theater" />
+          Theatrical release dates
+        </label>
+        <label>
+          <input id="sort_rt_score" class="sort_by" type="radio" name="sort_by" value="rt_score" />
+          Rotten Tomatoes rating
+        </label>
+        <!-- <label>
+        <input id="sort_manual" class="sort_by" type="radio" name="sort_by" value="manual" />
         Manual
-      </label>
-    </fieldset>
-    <input type="submit" value="Set" />
-  </form>
+        </label> -->
+      </fieldset>
+
+      <fieldset>
+        <label>
+          <input id="dir_up" type="radio" class="sort_my" name="sort_dir" value="up" />
+          Sort up
+        </label>
+        <label>
+          <input id="dir_down" type="radio" class="sort_my" name="sort_dir" value="down" />
+          Sort down
+        </label>
+      </fieldset>
+      <table width="100%"><tr>
+        <td width="50%"><!--<input type="button" value="Cancel" />--></td>
+        <td width="50%"><input type="submit" value="Done" /></td>
+      </tr></table>
+    </form>
+  </div>
 </div>

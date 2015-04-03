@@ -15,10 +15,10 @@
 	  </form>
     </div>
     <p>Or browse whats currently in theaters or whats coming soon:</p>
-    <fieldset class="ui-grid-a">
-      <div class="ui-block-a"><input type="button" value="In Theaters" id="search_intheaters" /></div>
-      <div class="ui-block-b"><input type="button" value="Coming Soon" id="search_comingsoon" /></div>
-    </fieldset>
+    <table width="100%"><tr>
+      <td width="50%"><input type="button" value="In Theaters" id="search_intheaters" /></td>
+      <td width="50%"><input type="button" value="Coming Soon" id="search_comingsoon" /></td>
+    </tr></table>
   </div>
   <!-- End Search UI -->
 
@@ -46,7 +46,7 @@
       <img src="{{posters.thumbnail}}" class="thumbnail" width="60" height="100">
 	  <p>{{synopsis}}</p>
     </div>
-  {{/movies}}
+    {{/movies}}
   </div>
 </div>
 {{else}}

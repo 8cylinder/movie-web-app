@@ -1,44 +1,35 @@
 //build: movie-app
-jQuery(document).on('pagecontainershow', function(event, ui){
-  //C.log('PC Show', ui.toPage[0].id); //ui.toPage, ui.prevPage);
-  if (ui.toPage[0].id == Pages.search){
-    Config.set_page(Pages.search);
 
+var search_init = (function(pub, c, rt, $)
+{
+  pub.set_return = function(){
+    $('#search #footer_plus').text('<');
+    $('#search #footer_plus').attr('href', '#home');
+  };
+  pub.setup_events = function(){
+    $('#search_form').submit (function(){
+      var search_str = $('#search_input').val();
+      $('#search_input').blur();
+      //show_busy();
+      rt.search (search_str, function(movies_data){
+        Search.build_list(movies_data);
+      });
+      return false; //so the submit doesn't reload page
+    });
 
-    //jQuery(document).on("pagecreate", '#search', function(event){
-    C.log('pagecreate search')
-
-
-    Config.set_page(Pages.search);
-    //jQuery('text#big_button').text('<');
-    //jQuery('a#big_button_link').attr('xlink:href', 'javascript:history.back()');
-
-    (function(pub, c, rt, $, search)
-     {
-       $('#search_form').submit (function(){
-         var search_str = $('#search_input').val();
-         $('#search_input').blur();
-         //show_busy();
-         rt.search (search_str, function(movies_data){
-           search.build_list(movies_data);
-         });
-         return false; //so the submit doesn't reload page
-       });
-
-       $('#search_intheaters').click(function(){
-         rt.in_theaters (function (movies_data){
-           search.build_list(movies_data);
-         });
-       });
-       $('#search_comingsoon').click(function(){
-         rt.coming_soon (function (movies_data){
-           search.build_list(movies_data);
-         });
-       });
-     }({}, C, RT, jQuery, Search));
-  }
-});
-
+    $('#search_intheaters').click(function(){
+      rt.in_theaters (function (movies_data){
+        Search.build_list(movies_data);
+      });
+    });
+    $('#search_comingsoon').click(function(){
+      rt.coming_soon (function (movies_data){
+        Search.build_list(movies_data);
+      });
+    });
+  };
+  return pub;
+}({}, console, RT, jQuery));
 
 var Search = (function(pub, $, hb, c, rt, movies, pages, clean)
 {
@@ -55,11 +46,14 @@ var Search = (function(pub, $, hb, c, rt, movies, pages, clean)
   pub.bind_event = function(){
     $('.search_movie').on('tap', function(){
       rt.details(this.id, function(rt_details){
-        movies.add(rt_details);
-        home.show_movies();
-        $('body').pagecontainer('change', '#home');
+        if (movies.add(rt_details)){
+          home.show_movies();
+          $('body').pagecontainer('change', '#home');
+        }else{
+          alert('Movie already in list');
+        }
       });
     });
   };
   return pub;
-}({}, jQuery, Handlebars, C, RT, Movies, Pages, Clean));
+}({}, jQuery, Handlebars, console, RT, Movies, Pages, Clean));

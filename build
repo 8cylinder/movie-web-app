@@ -315,6 +315,13 @@ copy_css(){
     else
         err $css_assets
     fi
+    title 'Copy CSS Images:'
+    cssimages_assets=$(get-files cssimages) || error $cssimages_assets
+    if cp $cssimages_assets "$distroot/css/images"; then
+        ok $cssimages_assets
+    else
+        err $cssimages_assets
+    fi
 }
 
 # ----------------------------------------------------

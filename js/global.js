@@ -1,65 +1,100 @@
 //build: movie-app
 
-/*
-global objects:
-  jQuery
-  Handlebars
-  c
-  Config
-*/
-
 jQuery.noConflict();
 
+var Config = (function(pub, store)
+{
+  pub.debug = true;
+  pub.storage_version = 1;
+  pub.app_version = 1;
 
-var Config = {
-  debug: true,
-  storage_version: 1,
-  app_version: 1,
-  this_page: '',
-  last_page: '',
-  set_page: function(page){
-    Store.put('current_page', page);
-  },
-  get_page: function(){
-    return Store.get('current_page');
-  },
-  set_details_id: function(id){
-    Store.put('details_id', id);
-  },
-  get_details_id: function(){
-    return Store.get('details_id');
-  },
-  set_current_list: function(name){
-    Store.put('active_list', name);
-  },
-  get_current_list: function(){
-    return Store.get('active_list');
-  }
+  pub.set_page = function(page){
+    store.put('current_page', page);
+  };
+  pub.get_page = function(){
+    return store.get('current_page');
+  };
+  pub.set_details_id = function(id){
+    store.put('details_id', id);
+  };
+  pub.get_details_id = function(){
+    return store.get('details_id');
+  };
+  pub.set_list = function(name){
+    store.put('active_list', name);
+  };
+  pub.get_list = function(){
+    var l = store.get('active_list') || [];
+    if (l.length == 0){
+      l = '0';
+      pub.set_list(l);
+    }
+    return l;
+  };
+  return pub;
+})({}, Store);
 
-};
 var Pages = {
   init: 'init',
   home: 'home',
   search: 'search',
-  details: 'details'
+  details: 'details',
+  sort: 'sort',
+  lists: 'lists'
 };
 
-var C = (function(pub, app)
+(function(config, pages, c, $)
 {
-  //console.log('creating C')
-  var console_methods = [
-    'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
-    'group', 'groupCollapsed', 'groupEnd', 'info', 'log', 'profile',
-    'profileEnd', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'];
+  $(document).on("pagecreate", function(event){
+    var list_count = JSON.parse(localStorage.getItem('lists'));
+    if (! list_count || ! list_count.length){
+      c.log('creating first list (id: 0)');
+      MovieLists.create('All Movies', '', '0');
+    }
 
-  for (var i = 0; i < console_methods.length; i++) {
-    var method = console_methods[i];
+  });
+  $(document).on("pagecreate", '#home', function(event){
+    // if (MovieLists.get_all().length == 0){
+    //   lists.new_list('All Movies');
+    // }
+    home.show_movies();
+  });
+  $(document).on("pagecreate", '#search', function(event){
+    search_init.setup_events();
+    search_init.set_return();
+  });
+  $(document).on("pagecreate", '#sort', function(event){
+    sort.setup_events();
+  });
+  $(document).on("pagecreate", '#lists', function(event){
+    lists.setup_events();
+    lists.set_return();
+    lists.show_lists();
+    //lists.setup_list_events();
+  });
+  $(document).on("pagecreate", '#sort', function(event){
+    sort.init();
+  });
 
-    pub[method] = function() {
-      if (app.debug == true) {
-        console[method].apply(console, arguments);
-      }
-    };
-  }
-  return pub;
-})({}, Config);
+
+  $(document).on('pagecontainershow', function(event, ui){
+    var current_page = ui.toPage[0].id;
+    config.set_page(current_page);
+
+    switch (current_page){
+      case pages.init:
+        break;
+      case pages.home:
+        break;
+      case pages.search:
+        break;
+      case pages.details:
+        details.show_details();
+        break;
+      case pages.sort:
+        break;
+      case pages.lists:
+        break;
+    }
+  });
+})(Config, Pages, console, jQuery);
