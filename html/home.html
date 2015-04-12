@@ -16,7 +16,7 @@
   </div>
 
   <div id="home_content"></div>
-  [insert:html/html_templates/footer.html]
+[insert:html/html_templates/footer.html]
 </div>
 <!-- {{! TEMPLATE BEGIN ========================= }} -->
 <script id="movie_list_template" type="text/x-handlebars-template">
@@ -36,9 +36,7 @@
           <span class="small_title">Theater:</span> {{release_dates.theater}}
         </p>
         <p class="rt_scores clip">
-          <span class="small_title">RT Score:</span> {{ratings.critics_score}},
-          {{ratings.critics_rating}}
-        </p>
+          <span class="small_title">RT Score:</span> {{{ratings.fancy}}}</p>
       </div>
       <div class="blur"
            style="background-image: url({{posters.thumbnail}});"></div>
@@ -46,9 +44,10 @@
     </div>
     {{/movies}}
   </div>
+  [insert:html/html_templates/about.html]
   {{else}}
   <div id="search_list" class="not_found">
-    <p class="title">Welcome to %%app_name%%<span class="fancy">!</span></p>
+    <p class="title" style="text-align:center;">Welcome to %%app_name%%<span class="fancy">!</span></p>
     <p>Tap the '+' at the bottom of the screen to start adding movies to your list.</p>
     <p>Tap the 'Lists' at the bottom to create different lists that you can then add movies to.</p>
   </div>

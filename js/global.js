@@ -51,31 +51,23 @@ var Pages = {
       c.log('creating first list (id: 0)');
       MovieLists.create('All Movies', '', '0');
     }
-
   });
   $(document).on("pagecreate", '#home', function(event){
-    // if (MovieLists.get_all().length == 0){
-    //   lists.new_list('All Movies');
-    // }
     home.show_movies();
   });
   $(document).on("pagecreate", '#search', function(event){
     search_init.setup_events();
-    search_init.set_return();
   });
   $(document).on("pagecreate", '#sort', function(event){
     sort.setup_events();
   });
   $(document).on("pagecreate", '#lists', function(event){
     lists.setup_events();
-    lists.set_return();
     lists.show_lists();
-    //lists.setup_list_events();
   });
   $(document).on("pagecreate", '#sort', function(event){
     sort.init();
   });
-
 
   $(document).on('pagecontainershow', function(event, ui){
     var current_page = ui.toPage[0].id;

@@ -2,10 +2,6 @@
 
 var lists = (function(pub, $, config, c, movielists, hb)
 {
-  pub.set_return = function(){
-    $('#lists #footer_plus').text('<');
-    $('#lists #footer_plus').attr('href', '#home');
-  };
   pub.setup_events = function(){
     $('#lists_form').submit(function(){
       var new_name = $('#lists_input').val();

@@ -22,13 +22,27 @@ var Clean = (function(pub)
 
     // ratings
     if (movie.ratings.critics_score == '-1'){
-      movie.ratings.critics_score = 'Not rated yet';
+      //movie.ratings.critics_score = 'Not rated yet';
+      movie.ratings.fancy = '<i>Not rated yet</i>';
     } else {
-      var score = movie.ratings.critics_score;
-      score = score.toString();
-      movie.ratings.critics_score = score + '/100';
-      //movie.ratings.critics_score = '__/100'.merge([score]);
-      //movie.ratings.critics_score = score;
+      var ratings = '<span class="rt_image __"></span>__/100, __';
+      if (movie.ratings.critics_rating == 'Rotten')
+      {
+        movie.ratings.fancy = ratings.merge([
+          'rotten',
+          movie.ratings.critics_score,
+          movie.ratings.critics_rating
+        ]);
+      }
+      else if (movie.ratings.critics_rating == 'Fresh' ||
+               movie.ratings.critics_rating == 'Certified Fresh')
+      {
+        movie.ratings.fancy = ratings.merge([
+          'fresh',
+          movie.ratings.critics_score,
+          movie.ratings.critics_rating
+        ]);
+      }
     }
     return movie;
 

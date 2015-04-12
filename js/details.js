@@ -22,9 +22,6 @@ var details = (function(pub, $, hb, c, movies, config, rt, movielists)
     pub.get_synopsis(movie_id);
 
     $('#details_content').html(html);
-
-    $('#details #footer_plus').text('<');
-    $('#details #footer_plus').attr('href', '#home');
   };
   return pub;
 })({}, jQuery, Handlebars, console, Movies, Config, RT, MovieLists);

@@ -414,7 +414,7 @@ case $1 in
         compile-or-copy_vendor
 
         # showtree
-        cp test.html $distroot
+        #cp test.html $distroot
 
         ;;
     prod)

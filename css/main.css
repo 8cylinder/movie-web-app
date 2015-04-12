@@ -84,7 +84,7 @@ label {
 }
 
 a:visited {
-  color: #444444 !important;
+  color: #444444;
 }
 
 .sticky {
@@ -131,7 +131,7 @@ a:visited {
 .list_title .home_list_description {
   font-weight: 300;
   /*font-size: 15px */
-  margin: 10px;
+  margin: 12px 0 5px 0;
   display: none;
 }
 
@@ -144,6 +144,49 @@ a:visited {
 a, a:visited {
   color: black;
   text-decoration: none;
+}
+
+.ui-body-a a:visited {
+  color: black;
+}
+
+.app_about {
+  color: #808080;
+  /* border: 1px solid #000; */
+  padding: 20px;
+  line-height: 22px;
+  background-image: url("../images/star-flip.png");
+  background-size: 190px;
+  background-repeat: no-repeat;
+  background-position: right -15px top -4px;
+}
+.app_about p {
+  margin-bottom: 10px;
+}
+.app_about a, .app_about a:visited {
+  color: black;
+  color: #B2B2B2;
+  border-bottom: 1px dotted rgba(128, 128, 128, 0.33);
+  font-weight: 500;
+}
+
+.rt_image {
+  background-image: url("../images/icons-v2.png");
+  background-repeat: no-repeat;
+  display: inline-block;
+  margin: 0 4px 0 4px;
+}
+
+.fresh {
+  height: 12px;
+  width: 13px;
+  background-position: -258px -146px;
+}
+
+.rotten {
+  height: 10px;
+  width: 9px;
+  background-position: -276px -147px;
 }
 
 /************************** Home movie list ************************* */
@@ -181,7 +224,7 @@ a, a:visited {
 }
 #home_content .itemcontainer {
   position: relative;
-  background-color: #353535;
+  background-color: #1D1D1D;
   text-size: 20px;
   z-index: 0;
 }
@@ -217,6 +260,7 @@ a, a:visited {
 }
 
 .home_drop_down {
+  display: none;
   border-bottom: 1px solid black;
 }
 
@@ -268,11 +312,13 @@ a, a:visited {
   /*text-shadow: none */
   /*color: white */
   /*margin: 10px 20px */
+}
+#details_content .details_container {
   padding: 17px 20px;
-  position: inherit;
-  background-color: #000;
-  height: 100%;
-  z-index: -1;
+  /*position: inherit */
+  /*background-color: #000; */
+  /*height: 100% */
+  /*z-index: -1; */
 }
 #details_content p {
   margin-bottom: 8px;
@@ -292,18 +338,35 @@ a, a:visited {
 #details_content .small_title {
   font-weight: 500;
 }
-#details_content .blur {
+#details_content .details-background {
   position: fixed;
-  top: 0;
   height: 100%;
   width: 100%;
+  top: 0;
+  left: 0;
   z-index: -1;
+}
+#details_content .details-background .blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
   background-size: cover;
   background-position-x: center;
-  filter: blur(20px);
-  -webkit-filter: blur(30px);
   background-color: #575757;
   background-blend-mode: multiply;
+  filter: blur(20px);
+  -webkit-filter: blur(30px);
+}
+#details_content .details-background .blur-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: black;
 }
 #details_content img {
   float: left;
@@ -356,6 +419,7 @@ a, a:visited {
   padding: 8px 20px;
   background-color: #353535;
   text-size: 20px;
+  min-height: 200px;
 }
 
 .ui-input-btn, .ui-btn, input {
@@ -365,6 +429,7 @@ a, a:visited {
 
 .not_found {
   margin: 20px;
+  margin-bottom: 30px;
 }
 .not_found p {
   margin-bottom: 1em;
@@ -406,6 +471,7 @@ a, a:visited {
   background: #4E4E4E;
   border-radius: 6px;
   color: #B8B8B8;
+  height: 40px;
 }
 
 /******************************* footer ****************************** */
@@ -420,7 +486,7 @@ a, a:visited {
     bottom: -7px;
   }
 }
-.footer img {
+.footer img, .footer .footer_svg {
   display: block;
   width: 900px;
   left: 50%;
@@ -433,31 +499,29 @@ a, a:visited {
   height: 0;
   left: 50%;
   position: absolute;
-  bottom: 35px;
+  bottom: 39px;
+  /*font-size: 22px */
 }
 .footer .text {
-  font-size: 18px;
+  font-size: 22px;
   font-family: "Source Sans Pro" "helvetica neue" sans-serif;
   font-weight: 400;
   position: absolute;
   text-decoration: none;
   color: #444444;
 }
+.footer a, .footer a:visited {
+  color: #444444;
+}
 .footer #footer_plus {
   font-size: 71px;
   font-weight: 100;
-  bottom: -53px;
+  bottom: -57px;
   left: -16px;
 }
+.footer #footer_home {
+  right: 59px;
+}
 .footer #footer_lists {
-  right: 126px;
-}
-.footer #footer_share {
-  right: 55px;
-}
-.footer #footer_settings {
-  left: 53px;
-}
-.footer #footer_help {
-  left: 136px;
+  left: 66px;
 }

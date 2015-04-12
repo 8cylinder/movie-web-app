@@ -44,7 +44,7 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
         case 'rt_score':
           sort_method = 'Sort: Rating';
         default:
-          sort_method = '';
+          sort_method = sort_method;
       }
       $('#sort_link').text(sort_method);
     }
@@ -56,10 +56,12 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
     // using .on('tap') causes event problems.  Somehow
     // there are 1 1/2 events being fired if tap is used.
     $('.itemcontainer').on('click', '.movie', function(){
+      c.log('click')
       var detail_id = this.id;
       config.set_details_id(detail_id);
       $('body').pagecontainer('change', '#details');
     });
+
     // set a global var because I'm lazy right now.
     window.last_taphold_id = '';
     $('.itemcontainer').on('taphold', function(){
@@ -67,6 +69,7 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
       // hide lists if this is a second taphold on same row
       if(window.last_taphold_id == movie_id){
         $('.home_lists').empty();
+        c.log('remove drop down')
         window.last_taphold_id = '';
         return false;
       } else {
@@ -91,9 +94,12 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
       var html = template({'lists':all_lists});
 
       // hide others and display the list
-      $('.home_lists').empty();
+      //$('.home_lists').empty();
       var insert_point = '#__ .home_lists'.merge([this.id]);
       $(insert_point).html(html);
+      $('.home_drop_down').slideDown('slow', function(){
+        c.log('animate done', this)
+      });
 
       $('.home_list_item').on('tap', null, {'movie_id':movie_id}, function(event){
         var state = $(this).data('state');

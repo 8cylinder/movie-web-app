@@ -13,7 +13,7 @@
 
 <script id="details_template" type="text/x-handlebars-template">
   {{#movie}}
-  <div>
+  <div class="details_container">
     <div class="title_row">
       <span class="title">{{title}}</span>
       <!-- &nbsp; <span class="year">({{year}})</span> -->
@@ -23,17 +23,20 @@
     <p class="cast"><span class="small_title">Cast:</span> {{formated_cast}}</p>
     <p class="release_dates"><span class="small_title">Release dates:</span>
       <blockquote>
-      <span class="small_title">DVD:</span> {{release_dates.dvd}}<br>
-      <span class="small_title">Theater:</span> {{release_dates.theater}}
+        <span class="small_title">DVD:</span> {{release_dates.dvd}}<br>
+        <span class="small_title">Theater:</span> {{release_dates.theater}}
       </blockquote>
     </p>
     <p class="rt_scores">
       <span class="small_title">RT Score:</span> {{ratings.critics_score}},
       {{ratings.critics_rating}}
     </p>
+    <a href="{{links.alternate}}">{{title}} at Rotten Tomatoes</a>
     <p id="details_synopsis"></p>
-   </div>
-  <div class="blur"
-       style="background-image: url({{posters.thumbnail}});"></div>
+  </div>
+  <div class="details-background">
+    <div class="blur" style="background-image: url({{posters.thumbnail}});"></div>
+    <div class="blur-back"></div>
+  </div>
   {{/movie}}
 </script>

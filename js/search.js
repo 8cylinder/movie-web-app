@@ -2,10 +2,6 @@
 
 var search_init = (function(pub, c, rt, $)
 {
-  pub.set_return = function(){
-    $('#search #footer_plus').text('<');
-    $('#search #footer_plus').attr('href', '#home');
-  };
   pub.setup_events = function(){
     $('#search_form').submit (function(){
       var search_str = $('#search_input').val();
