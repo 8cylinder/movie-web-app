@@ -69,8 +69,12 @@ label
 
 .ui-page
     background-color: #3C3C3C
-a:visited
-    color: $darkertext
+
+.ui-page-theme-a a:visited,
+.ui-page-theme-a a
+    color: white
+    font-weight: 300
+    border-bottom: 1px solid rgba(255, 255, 255, 0.21)
 
 .sticky
     position: fixed
@@ -108,6 +112,8 @@ a:visited
     .sort_button
         float: right
         font-weight: 300
+        color: $darkertext
+        border-bottom: 1px solid #B1B1B1
     .home_list_description
         font-weight: 300
         /*font-size: 15px
@@ -116,7 +122,7 @@ a:visited
 
 .underline
     text-decoration: none
-    border-bottom: 1px solid rgba(105, 123, 255, 0.5)
+    border-bottom: 1px solid #ADADAD
     padding-bottom: 0
 
 a, a:visited
@@ -212,7 +218,7 @@ a, a:visited
     text-overflow: ellipsis
 
 .home_drop_down
-    display: none
+    /*display: none
     border-bottom: 1px solid black
 .home_lists
     background-color: #2F2E2E
@@ -388,7 +394,7 @@ a, a:visited
 
 /******************************* footer *******************************/
 .footer
-    @media only screen and (max-width: 370px)
+    /*@media only screen and (max-width: 370px)
         -webkit-transform: scale(0.79)
         bottom: -7px
     position: fixed

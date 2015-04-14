@@ -328,7 +328,7 @@ copy_css(){
 copy_images(){
     title 'Copy Images:'
     image_assets=$(get-files images) || error $image_assets
-    if cp $image_assets "$distroot/images"; then
+    if cp -r $image_assets "$distroot/images"; then
         ok $image_assets
     else
         err $image_assets
