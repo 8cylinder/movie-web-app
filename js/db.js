@@ -257,6 +257,25 @@ var Movies = (function(pub, c, store, rt, clean, movielists)
 
     return true;
   };
+  pub.update = function(rt_data){
+    var movies = store.get('movies') || [];
+    // look for duplicate movies
+    var new_id = rt_data.id;
+    for (var i = 0; i < movies.length; i++){
+      if (new_id === movies[i].id){
+        break;
+      }
+    }
+    // delete the synopsis since it takes up a lot
+    // of space.  It will get pulled from RT when
+    // viewing the details page.
+    rt_data.synopsis = '';
+
+    movies[i] = rt_data;
+    c.log('updating:', movies[i].title);
+    store.put('movies', movies);
+  };
+
   pub.delete_single = function(movie_id) {
     // remove the movie from all lists
     var lists = MovieLists.get_all();
@@ -272,6 +291,28 @@ var Movies = (function(pub, c, store, rt, clean, movielists)
       }
     }
     store.put('movies', data);
+  };
+  pub.update_release_dates = function(){
+    var last_update = store.get('last_update');
+    var old_date = moment(last_update).format('YYYY-MM-DD');
+    var now = moment().format('YYYY-MM-DD');
+    if (now == old_date){
+      return;
+    }
+    store.put('last_update', now);
+
+    var movies = this.get_all();
+    for (var i=0; i<movies.length; i++){
+      var dvd_date = movies[i].release_dates.dvd;
+      var theater_date = movies[i].release_dates.theater;
+      var movie_id = movies[i].id;
+      if (dvd_date != 'Unreleased' && theater_date != 'Unreleased'){
+        continue;
+      }
+      rt.details(movie_id, function(rt_details){
+        Movies.update(rt_details);
+      });
+    }
   };
 
   return pub;
