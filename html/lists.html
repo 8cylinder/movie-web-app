@@ -28,6 +28,7 @@
   <input type="button" id="lists_all" value="Show all movies" />
   {{#lists}}
   <div class="lists_item" id="{{id}}">
+    <span class="lists_count">{{count}}</span>
     <p class="title">{{title}}</p>
     <p class="description">{{description}}</p>
     <table width="100%"><tr>

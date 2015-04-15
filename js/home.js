@@ -3,6 +3,8 @@
 var home = (function(pub, $, hb, c, movies, config, movielists)
 {
   pub.show_movies = function() {
+    movies.update_release_dates();
+
     var current_list = config.get_list();
     var data = movies.get_all(current_list);
 
@@ -56,12 +58,10 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
     // using .on('tap') causes event problems.  Somehow
     // there are 1 1/2 events being fired if tap is used.
     $('.itemcontainer').on('click', '.movie', function(){
-      c.log('click')
       var detail_id = this.id;
       config.set_details_id(detail_id);
       $('body').pagecontainer('change', '#details');
     });
-
 
     $('.itemcontainer').on('taphold', function(){
 
@@ -98,9 +98,9 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
         $('.home_list_item').on('tap', null, {'movie_id':movie_id}, function(event){
           var state = $(this).data('state');
           if (state == 0){
-            movielists.add_movie(movie_id, event.data.movie_id);
+            movielists.add_movie(this.id, event.data.movie_id);
           } else if (state == 1) {
-            movielists.remove_movie(movie_id, event.data.movie_id);
+            movielists.remove_movie(this.id, event.data.movie_id);
           }
           $('.home_lists').empty();
           return false;

@@ -9,21 +9,21 @@ var sort = (function(pub, $, config, c, movielists)
     pub.preload_form(list);
   };
   pub.preload_form = function(list){
+    var sort_id;
     if (list.sort_method){
-      var sort_id = '#sort_' + list.sort_method;
+      sort_id = '#sort_' + list.sort_method;
       c.log(sort_id)
     } else {
-      var sort_id = '#sort_title';
+      sort_id = '#sort_title';
     }
-    //c.log(sort_id)
     $(sort_id).prop('checked', true);
 
+    var sort_dir;
     if (list.sort_direction){
-      var sort_dir = '#dir_' + list.sort_direction;
+      sort_dir = '#dir_' + list.sort_direction;
     } else {
-      var sort_dir = 'ascending';
+      sort_dir = 'ascending';
     }
-    //c.log(sort_dir)
     $(sort_dir).prop('checked', true);
   };
   pub.setup_events = function(){

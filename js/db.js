@@ -1,4 +1,5 @@
 //build: movie-app
+//themoviedb: ccf0b7283975ef925e9a69db90d20340
 var Clean = (function(pub)
 {
   pub.one = function(movie){
@@ -15,10 +16,21 @@ var Clean = (function(pub)
       movie.formated_directors = movie.abridged_directors[0].name;
     }
 
-    // release dates
-    if (movie.release_dates.dvd === undefined){
+    // DVD release dates
+    if (movie.release_dates.dvd === undefined ||
+        movie.release_dates.dvd === "Unreleased"){
       movie.release_dates.dvd = 'Unreleased';
+    } else {
+      var movie_dvd = movie.release_dates.dvd;
+      var pretty = moment(movie_dvd, 'YYYY-MM-DD');
+      pretty = pretty.format('MMM D, YYYY');
+      movie.release_dates.dvd = pretty;
     }
+    // Theater release dates
+    var theater_date = movie.release_dates.theater;
+    var theater_pretty = moment(theater_date, 'YYYY-MM-DD');
+    theater_pretty = theater_pretty.format('MMM D, YYYY');
+    movie.release_dates.theater = theater_pretty;
 
     // ratings
     if (movie.ratings.critics_score == '-1'){
@@ -132,12 +144,12 @@ var moviesort = function(method, direction){
         bb = bb.replace("the ", '');
       break;
       case 'dvd':
-        aa = a.release_dates.dvd;
-        bb = b.release_dates.dvd;
+        aa = a.release_dates.dvd || '9999-99-99';
+        bb = b.release_dates.dvd || '9999-99-99';
       break;
       case 'theater':
-        aa = a.release_dates.theater;
-        bb = b.release_dates.theater;
+        aa = a.release_dates.theater || '9999-99-99';
+        bb = b.release_dates.theater || '9999-99-99';
       break;
       case 'rt_score':
         aa = parseInt(a.ratings.critics_score);
@@ -147,7 +159,7 @@ var moviesort = function(method, direction){
         aa = bb = a; //a do nothing sort
       break;
     }
-    //console.log(aa, bb)
+    //console.log('sort', aa, bb)
     if (aa < bb)
       return -1;
     if (aa > bb)
@@ -246,6 +258,12 @@ var Movies = (function(pub, c, store, rt, clean, movielists)
     return true;
   };
   pub.delete_single = function(movie_id) {
+    // remove the movie from all lists
+    var lists = MovieLists.get_all();
+    for (var i=0; i<lists.length; i++){
+      MovieLists.remove_movie(lists[i].id, movie_id);
+    }
+
     var data = store.get('movies');
     // find the matching id
     for (var i=0; i<data.length; i++){
@@ -259,18 +277,16 @@ var Movies = (function(pub, c, store, rt, clean, movielists)
   return pub;
 })({}, console, Store, RT, Clean, MovieLists);
 
+
 var MovieLists = (function(pub, c, store)
 {
   var get_all = function(){
     var alists = store.get('lists') || [];
 
-    // for (var i=0; i<alists.length; i++){
-    //   //c.log(alists[i])
-    //   if (alists[i].id == '0'){
-    //     alists.splice(i,1);
-    //   }
-    // }
-    //c.log('>>', alists)
+    for (var i=0; i<alists.length; i++){
+      var list_count = alists[i].movies.length;
+      alists[i].count = list_count;
+    }
     alists.sort(listsort('id'));
     return alists;
   };
