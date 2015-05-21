@@ -8,14 +8,11 @@
 <div id="lists" data-role="page">
 
   <div class="search_controls">
-    <p>Add or remove <span class="lists_movie_title"></span> from lists
-      you have created, or create a new list.  When you do that, the
-      movie will be automaticaly added to the list you created.</p>
-
     <form id="lists_form">
-	  <input type="text" name="lists_input" id="lists_input" placeholder="New movie list" />
-      <textarea placeholder="Description" id="lists_description"></textarea>
+	  <input type="text" name="lists_input" id="lists_input" placeholder="List title" />
+      <textarea placeholder="Optional description" id="lists_description"></textarea>
       <input type="hidden" id="lists_id" value="" />
+      <input type="submit" value="Submit" />
     </form>
   </div>
   <div id="lists_content"></div>

@@ -188,9 +188,9 @@ compile_js(){
     js="$distroot/js"
     js_name='main.js'
 
+    cat $js_assets > $js/$js_name
     # if fast, only concatenate js, don't use closure compiler
     if [ "$1" == 'fast' ]; then
-        cat $js_assets > $js/$js_name
         ok "FAST COMPILE - $js/$js_name"
         return
     fi

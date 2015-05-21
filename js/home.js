@@ -2,6 +2,26 @@
 
 var home = (function(pub, $, hb, c, movies, config, movielists)
 {
+  pub.build_email = function(){
+    var current_list = config.get_list();
+    var data = movies.get_all(current_list);
+    var email_template = 'mailto:?subject=__&body=__';
+    var list = movielists.get_one(current_list);
+    var subject = encodeURI(list.title);
+    var body = list.description + '\n\n';
+    for (var i=0; i<data.length; i++){
+      var row_template = '__\n    __\n\n';
+      var row = row_template.merge(
+        [data[i].title, data[i].links.alternate]);
+      body += row;
+    }
+    var footer = '\n\nThis list brought to you by MovieStalker\nfrom 8cylinder.com';
+    body += footer;
+    body = encodeURI(body);
+    var full_email = email_template.merge([subject, body]);
+    return full_email;
+  };
+
   pub.show_movies = function() {
     movies.update_release_dates();
 
@@ -61,6 +81,12 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
       var detail_id = this.id;
       config.set_details_id(detail_id);
       $('body').pagecontainer('change', '#details');
+    });
+
+    $('#home_share_link').on('click', function(e){
+      var link = pub.build_email();
+      c.log(link);
+      this.href = link;
     });
 
     $('.itemcontainer').on('taphold', function(){

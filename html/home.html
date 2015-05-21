@@ -44,6 +44,9 @@
     </div>
     {{/movies}}
   </div>
+  <div class="home_list_controls">
+    <a href="" id="home_share_link" target="_blank">Share this list</a>
+  </div>
   [insert:html/html_templates/about.html]
   {{else}}
   <div id="search_list" class="not_found">
@@ -54,6 +57,7 @@
   {{/if}}
 </script>
 
+<!-- DROPDOWN -->
 <script id="home_list_template" type="text/x-handlebars-template">
   <table width="100%" class="home_drop_down">
     <!-- <tr>
