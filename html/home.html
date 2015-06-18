@@ -42,6 +42,7 @@
            style="background-image: url({{posters.thumbnail}});"></div>
       <div class="home_lists"></div>
     </div>
+    <div class="home_lists_member"></div>
     {{/movies}}
   </div>
   <div class="home_list_controls">
@@ -50,7 +51,7 @@
   [insert:html/html_templates/about.html]
   {{else}}
   <div id="search_list" class="not_found">
-    <p class="title" style="text-align:center;">Welcome to %%app_name%%<span class="fancy">!</span></p>
+    <p class="title">Welcome to %%app_name%%<span class="fancy">!</span></p>
     <p>Tap the '+' at the bottom of the screen to start adding movies to your list.</p>
     <p>Tap the 'Lists' at the bottom to create different lists that you can then add movies to.</p>
   </div>
@@ -60,10 +61,6 @@
 <!-- DROPDOWN -->
 <script id="home_list_template" type="text/x-handlebars-template">
   <table width="100%" class="home_drop_down">
-    <!-- <tr>
-    <td><div class="small_title">Lists this movie is a part of</div></td>
-    <td><div class="small_title">Delete</div></td>
-    </tr> -->
     <tr>
       <td width="66%">
         {{#if lists}}

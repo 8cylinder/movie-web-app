@@ -1,3 +1,5 @@
+.sass-cache/
+vendor_js*
 build.html
 build.log
 lists.html

@@ -111,6 +111,7 @@ var home = (function(pub, $, hb, c, movies, config, movielists)
             all_lists[i].state = '0';
           }
         }
+console.log(all_lists)
         // build the template
         var template_source = $('#home_list_template').html();
         var template = hb.compile(template_source);

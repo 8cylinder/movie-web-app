@@ -216,8 +216,11 @@ var Movies = (function(pub, c, store, rt, clean, movielists)
       movies.sort(moviesort(list.sort_method, list.sort_direction));
     }
 
+    // add a list of movielists each movie is in
+
     for (var i=0; i<movies.length; i++){
       var fixed = clean.one(movies[i]);
+      movielists.get_all(movies[i].id);
       movies[i] = fixed;
     }
     //movies.sort(moviesort('title'));
@@ -331,8 +334,12 @@ var MovieLists = (function(pub, c, store)
     alists.sort(listsort('id'));
     return alists;
   };
-  pub.get_all = function(){
+  pub.get_all = function(movie_id){
     var lists = get_all();
+    // if movie_id, only get the lists for this movie
+    if (movie_id){
+
+    }
     return lists;
   };
   pub.get_all_but_0 = function(){
